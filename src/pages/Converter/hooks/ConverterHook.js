@@ -127,15 +127,18 @@ const useConverterHook = () => {
 
   const handleFromInputChange = (event) => {
     const { value } = event.target;
-    setFromAndToTokenPairs({ ...fromAndToTokenValues, fromValue: value, toValue: value });
-    setFromToValueUpdated(true);
-    validateAmounts(value);
+    if (value > 0) {
+      setFromAndToTokenPairs({ ...fromAndToTokenValues, fromValue: value, toValue: value });
+      setFromToValueUpdated(true);
+      validateAmounts(value);
+    } else {
+      resetFromAndToValues();
+    }
   };
 
   const handleToInputChange = (event) => {
     const { value } = event.target;
     setFromAndToTokenPairs({ ...fromAndToTokenValues, toValue: value, fromValue: value });
-    setFromToValueUpdated(true);
   };
 
   const onSelectingFromToken = (selectedToken) => {
@@ -186,7 +189,9 @@ const useConverterHook = () => {
     setFromTokenPair(toPair.to_token);
     setToTokenPair(fromPair.from_token);
     updateConversionFees();
-    validateAmounts(value);
+    if (isFromToValueUpdated) {
+      validateAmounts(value);
+    }
   };
 
   const handleFromBlockchainSelection = () => {

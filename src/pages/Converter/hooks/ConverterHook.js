@@ -31,6 +31,7 @@ const useConverterHook = () => {
 
   const [conversionCharge, setConversionCharge] = useState({ symbol: '', amount: 0 });
   const [error, setError] = useState({ error: false, message: 'ERROR' });
+  const [isFromToValueUpdated, setFromToValueUpdated] = useState(false);
   const state = useSelector((state) => state);
   const blockchains = state.blockchains.entities;
   const { tokens } = state.tokenPairs;
@@ -51,12 +52,22 @@ const useConverterHook = () => {
   };
 
   const updateWalletBalance = (balanceInfo) => {
-    if (isValueGreaterThanProvided(fromAndToTokenValues.fromValue, balanceInfo.balance)) {
-      console.log(`${fromAndToTokenValues.fromValue} ${' '} ${balanceInfo.balance} ${'- in updateWalletBalance'}`);
-      updateError(errorMessages.INSUFFICIENT_BALANCE);
-    } else {
-      console.log('Resetting error in updateWalletBalance');
-      resetError();
+    const [pair] = tokens.filter((token) => token[tokenPairDirection.FROM].id === fromTokenPair.id);
+    const pairMinValue = convertFromCogs(pair.min_value, pair.from_token.allowed_decimal);
+    const pairMaxValue = convertFromCogs(pair.max_value, pair.from_token.allowed_decimal);
+
+    if (isFromToValueUpdated) {
+      if (isValueGreaterThanProvided(fromAndToTokenValues.fromValue, balanceInfo.balance)) {
+        console.log(`${fromAndToTokenValues.fromValue} ${' '} ${balanceInfo.balance} ${'- in updateWalletBalance'}`);
+        updateError(errorMessages.INSUFFICIENT_BALANCE);
+      } else if (isValueLessThanProvided(fromAndToTokenValues.fromValue, pairMinValue)) {
+        updateError(`${errorMessages.MINIMUM_TRANSACTION_AMOUNT + pairMinValue} ${' '} ${pair.from_token.symbol}`);
+      } else if (isValueGreaterThanProvided(fromAndToTokenValues.fromValue, pairMaxValue)) {
+        updateError(`${errorMessages.MAXIMUM_TRANSACTION_AMOUNT + pairMaxValue} ${' '} ${pair.from_token.symbol}`);
+      } else {
+        console.log('Resetting error in updateWalletBalance');
+        resetError();
+      }
     }
     setWalletBalance(balanceInfo);
   };
@@ -117,12 +128,14 @@ const useConverterHook = () => {
   const handleFromInputChange = (event) => {
     const { value } = event.target;
     setFromAndToTokenPairs({ ...fromAndToTokenValues, fromValue: value, toValue: value });
+    setFromToValueUpdated(true);
     validateAmounts(value);
   };
 
   const handleToInputChange = (event) => {
     const { value } = event.target;
     setFromAndToTokenPairs({ ...fromAndToTokenValues, toValue: value, fromValue: value });
+    setFromToValueUpdated(true);
   };
 
   const onSelectingFromToken = (selectedToken) => {

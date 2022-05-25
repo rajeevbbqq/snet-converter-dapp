@@ -16,6 +16,8 @@ import { availableBlockchains, externalLinks, supportedCardanoWallets } from '..
 import SnetSnackbar from '../snet-snackbar';
 import { useStyles } from './styles';
 
+const cardanoNetworkId = Number(process.env.REACT_APP_CARDANO_NETWORK_ID);
+
 const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const classes = useStyles();
   const [isAgreed, setIsAgreed] = useState(false);
@@ -24,7 +26,7 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const [isCardanoWalletExtensionAvailable, setIsCardanoWalletExtensionAvailable] = useState(true);
   const [error, setError] = useState({ showError: false, message: '' });
   const { address, disconnectEthereumWallet, connectEthereumWallet } = useWalletHook();
-  const { connectWallet, getChangeAddress, detectCardanoInjectableWallets } = useInjectableWalletHook([supportedCardanoWallets.NAMI]);
+  const { connectWallet, getChangeAddress, detectCardanoInjectableWallets } = useInjectableWalletHook([supportedCardanoWallets.NAMI], cardanoNetworkId);
   const state = useSelector((state) => state);
 
   const dispatch = useDispatch();

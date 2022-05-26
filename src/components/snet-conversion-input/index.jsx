@@ -43,14 +43,14 @@ const SnetConversionOptions = ({
 
   return (
     <>
-      <Stack spacing={1} direction="row" alignItems="center" marginBottom={2} justifyContent="space-between" id={`conversion-direction-${id}`}>
-        <Stack spacing={1} direction="row" alignItems="center">
+      <Stack sx={styles.fromToDetailsContainer} spacing={1} id={`conversion-direction-${id}`}>
+        <Stack spacing={1} sx={styles.fromToDropDownContainer}>
           <Typography sx={styles.dropDownLabel}>{direction}</Typography>
           {blockchains ? (
             <BlockchainDropdown value={selectedBlockchain} handleSelect={onSelectBlockchain} tokens={blockchains} id="snet-conversion-input" />
           ) : null}
         </Stack>
-        <Stack spacing={1} direction="row" alignItems="center" id={`wallet-address-${id}`}>
+        <Stack spacing={1} sx={styles.walletAddressContainer} id={`wallet-address-${id}`}>
           <WalletIcon sx={styles.walletIcon} />
           <Typography sx={styles.walletAddress}>
             {walletAddress === null || walletAddress === undefined ? 'Wallet Not Selected' : addEllipsisInBetweenString(walletAddress)}

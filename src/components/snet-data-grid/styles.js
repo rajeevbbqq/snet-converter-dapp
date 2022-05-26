@@ -61,7 +61,7 @@ export const useStyles = makeStyles({
         width: '100%',
         marginTop: 20,
         display: 'flex !important',
-        justifyContent: 'center'
+        justifyContent: 'flex-start'
       }
     },
     '& p': {
@@ -214,7 +214,7 @@ export const useStyles = makeStyles({
   },
   alignRight: {
     alignItems: 'flex-end !important',
-    '@media(max-width: 1200px)': { alignItems: 'center !important' }
+    '@media(max-width: 1200px)': { alignItems: 'flex-start !important' }
   },
   // Pagination styles
   paginationContainer: {

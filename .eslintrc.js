@@ -26,7 +26,6 @@ module.exports = {
     'react/require-default-props': 'off',
     'for-direction': 'off',
     'no-plusplus': 'off',
-    'no-restricted-syntax': 'off',
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'react/function-component-definition': [
       2,

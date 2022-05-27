@@ -43,8 +43,7 @@ export class ConverterPipeLineStack extends cdk.Stack {
       source: projectSource,
       concurrentBuildLimit: 1,
       environment: {
-        buildImage: codebuild.LinuxBuildImage.STANDARD_5_0,
-        computeType: codebuild.ComputeType.LARGE
+        buildImage: codebuild.LinuxBuildImage.STANDARD_5_0
       },
       role,
       buildSpec: codebuild.BuildSpec.fromObject({
@@ -54,14 +53,7 @@ export class ConverterPipeLineStack extends cdk.Stack {
             commands: ['node --version', `aws s3 sync s3://${configBucket}/${appConfigsFolder}/app .`, 'npm install']
           },
           build: {
-            commands: [
-              'export NODE_OPTIONS="--max-old-space-size=8192"',
-              'npm run build',
-              'cd cdk',
-              `aws s3 sync s3://${configBucket}/${appConfigsFolder}/cdk .`,
-              'npm install',
-              'npm run deploy'
-            ]
+            commands: ['npm run build', 'cd cdk', `aws s3 sync s3://${configBucket}/${appConfigsFolder}/cdk .`, 'npm install', 'npm run deploy']
           }
         }
       })
@@ -90,6 +82,7 @@ export class ConverterPipeLineStack extends cdk.Stack {
       ],
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
     });
+
 
     new deploy.BucketDeployment(this, `${environment}-converter-dapp-deployment`, {
       sources: [deploy.Source.asset('../build')],

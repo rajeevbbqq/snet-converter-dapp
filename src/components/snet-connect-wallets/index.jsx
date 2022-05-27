@@ -6,27 +6,22 @@ import propTypes from 'prop-types';
 import { Box, Typography } from '@mui/material';
 import { isNil } from 'lodash';
 import store from 'store';
-import useInjectableWalletHook from '../../libraries/useInjectableWalletHook';
 import SnetDialog from '../snet-dialog';
 import SnetBlockchainList from '../snet-blockchains-list';
 import { useWalletHook } from '../snet-wallet-connector/walletHook';
 import SnetButton from '../snet-button';
 import { setWallets, removeFromAndToAddress } from '../../services/redux/slices/wallet/walletSlice';
-import { availableBlockchains, externalLinks, supportedCardanoWallets } from '../../utils/ConverterConstants';
+import { availableBlockchains, externalLinks } from '../../utils/ConverterConstants';
 import SnetSnackbar from '../snet-snackbar';
 import { useStyles } from './styles';
-
-const cardanoNetworkId = Number(process.env.REACT_APP_CARDANO_NETWORK_ID);
 
 const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const classes = useStyles();
   const [isAgreed, setIsAgreed] = useState(false);
   const [enableAgreeButton, setEnableAgreeButton] = useState(false);
   const [cardanoAddress, setCardanoAddress] = useState(null);
-  const [isCardanoWalletExtensionAvailable, setIsCardanoWalletExtensionAvailable] = useState(true);
   const [error, setError] = useState({ showError: false, message: '' });
   const { address, disconnectEthereumWallet, connectEthereumWallet } = useWalletHook();
-  const { connectWallet, getChangeAddress, detectCardanoInjectableWallets } = useInjectableWalletHook([supportedCardanoWallets.NAMI], cardanoNetworkId);
   const state = useSelector((state) => state);
 
   const dispatch = useDispatch();
@@ -39,24 +34,10 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
     setEnableAgreeButton(addressessAvailable);
   };
 
-  const getCardanoAddress = () => {
-    try {
-      const isCardanoWalletAvailable = detectCardanoInjectableWallets();
-      setIsCardanoWalletExtensionAvailable(isCardanoWalletAvailable);
-
-      if (!isCardanoWalletAvailable) {
-        const cachedCardanoAddress = store.get(availableBlockchains.CARDANO) ?? null;
-        setCardanoAddress(cachedCardanoAddress);
-      }
-    } catch (error) {
-      console.log('Error on getCardanoAddress', error);
-      throw new Error(error);
-    }
-  };
-
   useEffect(() => {
-    getCardanoAddress();
-  }, []);
+    const cachedCardanoAddress = store.get(availableBlockchains.CARDANO) ?? null;
+    setCardanoAddress(cachedCardanoAddress);
+  });
 
   useEffect(() => {
     enableOrDisableAgreebutton();
@@ -138,43 +119,6 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
     setError({ showError: false, message: '' });
   };
 
-  const connectCardanoWallet = async () => {
-    try {
-      await connectWallet(supportedCardanoWallets.NAMI);
-      const cardanoWalletAddress = await getChangeAddress();
-      setCardanoAddress(cardanoWalletAddress);
-    } catch (error) {
-      console.error('Error connectCardanoWallet:', error);
-    }
-  };
-
-  const connectWalletOptions = async (blockchain) => {
-    try {
-      const blockchainName = upperCase(blockchain);
-      if (blockchainName === availableBlockchains.ETHEREUM) {
-        connectEthereumWallet();
-      }
-
-      if (blockchainName === availableBlockchains.CARDANO) {
-        await connectCardanoWallet();
-      }
-    } catch (error) {
-      console.log('Error while connecting wallet', error);
-      throw error;
-    }
-  };
-
-  const checkExtensionAvailableByBlockchain = (blockchain) => {
-    const blockchainName = upperCase(blockchain);
-    if (blockchainName === availableBlockchains.ETHEREUM) {
-      return true;
-    }
-    if (blockchainName === availableBlockchains.CARDANO) {
-      return isCardanoWalletExtensionAvailable;
-    }
-    return false;
-  };
-
   return (
     <>
       <SnetSnackbar open={error.showError} message={error.message} onClose={closeError} />
@@ -187,10 +131,10 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
                 blockchain={blockchain.name}
                 blockchainLogo={blockchain.logo}
                 blockChainConnectInfo={blockchain.description}
-                isWalletAvailable={checkExtensionAvailableByBlockchain(blockchain.name)}
+                isWalletAvailable={blockchain.is_extension_available}
                 walletAddress={getWalletAddress(blockchain.name)}
                 onSaveAddress={onSaveAddress}
-                openWallet={() => connectWalletOptions(blockchain.name)}
+                openWallet={connectEthereumWallet}
                 disconnectWallet={() => onClickDisconnectWallet(blockchain.name)}
                 cardanoAddress={cardanoAddress}
               />

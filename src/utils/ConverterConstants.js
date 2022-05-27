@@ -5,10 +5,6 @@ export const progress = {
   ERROR: 'ERROR'
 };
 
-export const supportedCardanoWallets = {
-  NAMI: 'NAMI'
-};
-
 export const supportedEthereumNetworks = {
   1: 'Mainnet',
   3: 'Ropsten'

@@ -82,6 +82,32 @@ const styles = {
       }
     },
     '& input': { fontSize: 26 }
+  },
+  fromToDetailsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: '16px',
+    justifyContent: 'space-between',
+    '@media(max-width: 540px)': {
+      flexDirection: 'column',
+      alignItems: 'flex-start'
+    }
+  },
+  fromToDropDownContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    '& > div': {
+      margin: '0 0 0 8px !important',
+      '@media(max-width: 540px)': { width: '100%' }
+    },
+    '@media(max-width: 540px)': { width: '100%' }
+  },
+  walletAddressContainer: {
+    margin: '0 !important',
+    flexDirection: 'row',
+    alignItems: 'end',
+    '& > p': { margin: '0 0 0 8px !important' },
+    '@media(max-width: 540px)': { marginTop: '10px !important' }
   }
 };
 

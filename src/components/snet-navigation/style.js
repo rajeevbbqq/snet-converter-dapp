@@ -44,6 +44,10 @@ const useMenubarStyles = makeStyles(() => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    '@media(max-width: 480px)': {
+      flexDirection: 'column',
+      alignItems: 'flex-start'
+    },
     '& button': {
       '@media(max-width: 600px)': { fontSize: 12 }
     }

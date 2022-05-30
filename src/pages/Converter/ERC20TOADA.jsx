@@ -177,7 +177,7 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
             toSelectedBlockchain={toSelectedBlockchain}
             handleFromBlockchainSelection={handleFromBlockchainSelection}
             handleToBlockchainSelection={handleToBlockchainSelection}
-            onSwapBlockchain={() => swapBlockchains(fromAndToTokenValues.fromValue)}
+            onSwapBlockchain={() => swapBlockchains()}
             fromTokenPair={fromTokenPair}
             toTokenPair={toTokenPair}
             onSelectingFromToken={onSelectingFromToken}

@@ -111,7 +111,9 @@ const DepositAndBurnTokens = ({ onClickCancel, onClickContinueLater, isBurning, 
                   <span>
                     {isDepositReceived
                       ? 'Deposit received successfully'
-                      : `Processing: ${isBurning ? 'Burning Tokens' : 'Receiving Confirmation'} ${blockConfiramtionsReceived}/${blockConfiramtionsRequired}`}
+                      : `Processing: ${
+                          isBurning ? 'Burning Tokens, Awaiting confirmation' : 'Receiving Confirmation'
+                        } ${blockConfiramtionsReceived}/${blockConfiramtionsRequired}`}
                   </span>
                   {isDepositReceived ? null : (
                     <Typography>

@@ -44,10 +44,8 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
       const isCardanoWalletAvailable = detectCardanoInjectableWallets();
       setIsCardanoWalletExtensionAvailable(isCardanoWalletAvailable);
 
-      if (!isCardanoWalletAvailable) {
-        const cachedCardanoAddress = store.get(availableBlockchains.CARDANO) ?? null;
-        setCardanoAddress(cachedCardanoAddress);
-      }
+      const cachedCardanoAddress = store.get(availableBlockchains.CARDANO) ?? null;
+      setCardanoAddress(cachedCardanoAddress);
     } catch (error) {
       console.log('Error on getCardanoAddress', error);
       throw new Error(error);
@@ -142,6 +140,7 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
     try {
       await connectWallet(supportedCardanoWallets.NAMI);
       const cardanoWalletAddress = await getChangeAddress();
+      await store.set(availableBlockchains.CARDANO, cardanoWalletAddress);
       setCardanoAddress(cardanoWalletAddress);
     } catch (error) {
       console.error('Error connectCardanoWallet:', error);

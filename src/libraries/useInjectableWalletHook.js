@@ -173,7 +173,7 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       injectedWallet = await window.cardano[connectingWallet].enable();
       const currentNetworkId = await getNetworkId();
 
-      if (currentNetworkId !== expectedNetworkId) {
+      if (Number(currentNetworkId) !== Number(expectedNetworkId)) {
         throw new Error('Invalid network id selected');
       }
 
@@ -203,8 +203,9 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     return txOutputs;
   };
 
-  const transferTokens = async (transferWalletAddress, assetPolicyIdHex, assetNameHex, assetQuantity) => {
+  const transferTokens = async (walletName, transferWalletAddress, assetPolicyIdHex, assetNameHex, assetQuantity) => {
     try {
+      await connectWallet(walletName);
       const txBuilder = await initTransactionBuilder();
       const changeAddress = await getChangeAddress();
       const shelleyOutputAddress = Address.from_bech32(transferWalletAddress);

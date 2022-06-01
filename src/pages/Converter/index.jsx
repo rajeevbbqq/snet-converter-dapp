@@ -19,7 +19,7 @@ const ERC20TOADA = lazy(() => import('./ERC20TOADA'));
 const Converter = () => {
   const [error, setError] = useState({ showError: false, message: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const { tokenPairs } = useSelector((state) => state);
+  const { tokenPairs, wallet } = useSelector((state) => state);
   const classes = useStyles();
 
   const { transferTokens } = useInjectableWalletHook([supportedCardanoWallets.NAMI], process.env.REACT_APP_CARDANO_NETWORK_ID);
@@ -39,8 +39,7 @@ const Converter = () => {
       const assetPolicyId = conversionInfo.pair.from_token.token_address;
       const depositAmount = bigNumberToString(amount);
 
-      // TODO: The hardcoded NAMI wallet should be replaced with the wallet selected by the user
-      await transferTokens(supportedCardanoWallets.NAMI, depositAddress, assetPolicyId, assetNameHex, depositAmount);
+      await transferTokens(wallet.cardanoWalletSelected, depositAddress, assetPolicyId, assetNameHex, depositAmount);
       dispatch(setAdaConversionInfo(conversionInfo));
       dispatch(setConversionDirection(availableBlockchains.CARDANO));
       dispatch(setActiveStep(conversionSteps.CONVERT_TOKENS));

@@ -4,6 +4,7 @@ import { conversionDirections } from '../../../../utils/ConverterConstants';
 const walletSlice = createSlice({
   name: 'wallets',
   initialState: {
+    cardanoWalletSelected: null,
     isWalletInitializing: true,
     wallets: [],
     signature: '',
@@ -12,6 +13,9 @@ const walletSlice = createSlice({
     conversionDirection: conversionDirections.ETH_TO_ADA
   },
   reducers: {
+    setCardanoWalletSelected: (state, action) => {
+      state.cardanoWalletSelected = action.payload;
+    },
     setFromAddress: (state, action) => {
       state.fromAddress = action.payload;
     },
@@ -34,6 +38,7 @@ const walletSlice = createSlice({
   }
 });
 
-export const { setWallets, setSignature, setFromAddress, setToAddress, removeFromAndToAddress, setConversionDirection } = walletSlice.actions;
+export const { setCardanoWalletSelected, setWallets, setSignature, setFromAddress, setToAddress, removeFromAndToAddress, setConversionDirection } =
+  walletSlice.actions;
 
 export default walletSlice;

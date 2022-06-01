@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
-import { useSelector } from 'react-redux';
+import store from 'store';
+import { useSelector, useDispatch } from 'react-redux';
 import { isEmpty, size } from 'lodash';
 import propTypes from 'prop-types';
 import { NavLink, Link, useLocation } from 'react-router-dom';
@@ -12,6 +14,8 @@ import Paths from '../../router/paths';
 import BridgeLogo from './BridgeLogo';
 import SnetButton from '../snet-button';
 import HamburgerMenu from './HamburgerMenu';
+import { setCardanoWalletSelected } from '../../services/redux/slices/wallet/walletSlice';
+import { cardanoWalletConnected } from '../../utils/ConverterConstants';
 
 const WalletMenu = ({ openConnectedWallets }) => {
   const classes = useMenubarStyles();
@@ -20,7 +24,16 @@ const WalletMenu = ({ openConnectedWallets }) => {
   const state = useSelector((state) => state);
   const { wallets } = state.wallet;
 
+  const dispatch = useDispatch();
+
   const splitLocation = pathname.split('/');
+
+  useEffect(() => {
+    if (!isEmpty(wallets)) {
+      const cardanoWallet = store.get(cardanoWalletConnected) ?? null;
+      dispatch(setCardanoWalletSelected(cardanoWallet));
+    }
+  }, [wallets]);
 
   return (
     <AppBar position="static" color="white" sx={{ padding: 2 }} className={classes.header}>

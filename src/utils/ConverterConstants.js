@@ -20,7 +20,7 @@ export const supportedCardanoWallets = [
   },
   {
     wallet: 'CWallet',
-    identifier: 'cwallet',
+    identifier: 'cardwallet',
     logo: 'https://uploads-ssl.webflow.com/60d83e3c6cf84748f7d0a62b/61281040b3b41b00da5259ec_Cardwallet.png',
     site: 'https://cwallet.finance'
   },
@@ -173,3 +173,5 @@ export const ContactSupportTypeOptions = [
     label: contactSupportType.FEEDBACK
   }
 ];
+
+export const cardanoWalletConnected = 'cardanoWalletConnected';

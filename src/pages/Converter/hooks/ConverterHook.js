@@ -40,6 +40,7 @@ const useConverterHook = () => {
   const dispatch = useDispatch();
 
   const resetFromAndToValues = () => {
+    setFromToValueUpdated(false);
     setFromAndToTokenPairs({ fromValue: 0, toValue: 0 });
   };
 

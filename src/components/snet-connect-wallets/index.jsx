@@ -12,7 +12,7 @@ import SnetBlockchainList from '../snet-blockchains-list';
 import { useWalletHook } from '../snet-wallet-connector/walletHook';
 import SnetButton from '../snet-button';
 import { setWallets, removeFromAndToAddress, setCardanoWalletSelected } from '../../services/redux/slices/wallet/walletSlice';
-import { availableBlockchains, cardanoWalletConnected, externalLinks, supportedCardanoWallets } from '../../utils/ConverterConstants';
+import { availableBlockchains, cardanoSupportingWallets, cardanoWalletConnected, externalLinks, supportedCardanoWallets } from '../../utils/ConverterConstants';
 import SnetSnackbar from '../snet-snackbar';
 import { useStyles } from './styles';
 
@@ -26,7 +26,7 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const [isCardanoWalletExtensionAvailable, setIsCardanoWalletExtensionAvailable] = useState(true);
   const [error, setError] = useState({ showError: false, message: '' });
   const { address, disconnectEthereumWallet, connectEthereumWallet } = useWalletHook();
-  const { connectWallet, getChangeAddress, detectCardanoInjectableWallets } = useInjectableWalletHook([supportedCardanoWallets.NAMI], cardanoNetworkId);
+  const { connectWallet, getChangeAddress, detectCardanoInjectableWallets } = useInjectableWalletHook(cardanoSupportingWallets, cardanoNetworkId);
   const state = useSelector((state) => state);
 
   const dispatch = useDispatch();

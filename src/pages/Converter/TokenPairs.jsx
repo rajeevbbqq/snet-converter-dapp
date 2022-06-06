@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux';
-import toUpper from 'lodash/toUpper';
 import { isEmpty } from 'lodash';
 import { Typography, Button } from '@mui/material';
 import SwapIcon from '@mui/icons-material/SwapVert';
@@ -8,7 +7,6 @@ import Stack from '@mui/material/Stack';
 import propTypes from 'prop-types';
 import SnetConversionDropdown from '../../components/snet-conversion-input';
 import SnetConversionCharges from '../../components/sent-conversion-charges';
-import { availableBlockchains } from '../../utils/ConverterConstants';
 import styles from './styles';
 
 const TokenPairs = ({
@@ -54,7 +52,7 @@ const TokenPairs = ({
         direction="FROM"
         id="from"
       />
-      {toUpper(fromSelectedBlockchain.name) === availableBlockchains.ETHEREUM && !isEmpty(wallets) ? (
+      {!isEmpty(wallets) ? (
         <Stack direction="row" alignItems="center" marginTop={1}>
           <Typography variant="caption">Balance: </Typography>
           <Typography variant="caption" marginX={1}>

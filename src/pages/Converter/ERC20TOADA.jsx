@@ -10,7 +10,7 @@ import useConverterHook from './hooks/ConverterHook';
 import ConversionFormLoader from './ConversionFormLoader';
 import TokenPairs from './TokenPairs';
 import useERC20TokenHook from './hooks/ERC20TokenHook';
-import { availableBlockchains, conversionDirections, conversionStatuses, conversionSteps } from '../../utils/ConverterConstants';
+import { availableBlockchains, cardanoSupportingWallets, conversionDirections, conversionStatuses, conversionSteps } from '../../utils/ConverterConstants';
 import SnetAlert from '../../components/snet-alert';
 import SnetLoader from '../../components/snet-loader';
 import SnetConversionStatus from '../../components/snet-conversion-status';
@@ -21,6 +21,8 @@ import Paths from '../../router/paths';
 import ETHTOADAConversionPopup from './ETHTOADAConversionPopup';
 import styles from './styles';
 import { resetConversionStepsForAdaToEth, setActiveStep, setConversionStatus } from '../../services/redux/slices/tokenPairs/tokenPairSlice';
+import useInjectableWalletHook from '../../libraries/useInjectableWalletHook';
+import { convertFromCogs } from '../../utils/bignumber';
 
 const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [showConfirmationBlockPopup, setConfirmationBlockPopup] = useState(false);
   const [errorRedirectTo, seterrorRedirectTo] = useState(null);
-  const { conversionDirection } = useSelector((state) => state.wallet);
+  const { conversionDirection, cardanoWalletSelected } = useSelector((state) => state.wallet);
   const { blockchainStatus } = useSelector((state) => state.blockchains);
   const {
     fromBlockchains,
@@ -68,10 +70,21 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
     isConversionInProgress
   } = useERC20TokenHook();
   const { toAddress, fromAddress, wallets } = wallet;
+  const { getBalanceByPolicyScriptId } = useInjectableWalletHook(cardanoSupportingWallets, process.env.REACT_APP_CARDANO_NETWORK_ID);
 
-  const getBalanceFromWallet = async () => {
-    const balanceInfo = await fetchWalletBalance(fromTokenPair.token_address);
-    updateWalletBalance(balanceInfo);
+  const getBalanceFromWallet = async (blockchainName) => {
+    blockchainName = toUpper(blockchainName);
+    if (blockchainName === availableBlockchains.ETHEREUM) {
+      const balanceInfo = await fetchWalletBalance(fromTokenPair.token_address);
+      updateWalletBalance(balanceInfo);
+    }
+
+    if (blockchainName === availableBlockchains.CARDANO) {
+      const { name, quantity } = await getBalanceByPolicyScriptId(cardanoWalletSelected, fromTokenPair.token_address);
+      const balance = convertFromCogs(quantity, fromTokenPair.allowed_decimal);
+      const balanceInfo = { symbol: name, balance };
+      updateWalletBalance(balanceInfo);
+    }
   };
 
   useEffect(() => {
@@ -81,8 +94,8 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
   }, [fromAndToTokenValues, conversionDirection, wallets]);
 
   useEffect(() => {
-    if (!isEmpty(fromTokenPair) && toUpper(fromTokenPair.blockchain.name) === availableBlockchains.ETHEREUM) {
-      getBalanceFromWallet();
+    if (!isEmpty(fromTokenPair)) {
+      getBalanceFromWallet(fromTokenPair.blockchain.name);
     }
   }, [fromTokenPair, wallets, fromAndToTokenValues, conversionDirection]);
 

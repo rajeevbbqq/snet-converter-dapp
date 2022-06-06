@@ -272,7 +272,8 @@ const useConverterHook = () => {
     error,
     walletBalance,
     updateWalletBalance,
-    resetFromAndToValues
+    resetFromAndToValues,
+    isFromToValueUpdated
   };
 };
 

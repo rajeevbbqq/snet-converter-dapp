@@ -155,12 +155,26 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     }
   };
 
+  const getUnusedAddresses = async () => {
+    try {
+      const raw = await injectedWallet.getUnusedAddresses();
+      const unusedAddressess = raw.map((address) => {
+        return Address.from_bytes(Buffer.from(address, 'hex')).to_bech32();
+      });
+
+      console.log('unusedAddressess: ', unusedAddressess);
+    } catch (error) {
+      console.log('Error on getUnusedAddresses: ', JSON.stringify(error));
+    }
+  };
+
   const getChangeAddress = async () => {
     try {
       const raw = await injectedWallet.getChangeAddress();
 
       await getUsedAddresses();
       await getRewardAddresses();
+      await getUnusedAddresses();
 
       const changeAddress = Address.from_bytes(Buffer.from(raw, 'hex')).to_bech32();
       console.log('Wallet address: ', changeAddress);

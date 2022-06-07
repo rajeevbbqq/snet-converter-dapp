@@ -40,6 +40,7 @@ const useConverterHook = () => {
   const dispatch = useDispatch();
 
   const resetFromAndToValues = () => {
+    setFromToValueUpdated(false);
     setFromAndToTokenPairs({ fromValue: 0, toValue: 0 });
   };
 
@@ -123,6 +124,7 @@ const useConverterHook = () => {
     }
     const amountInString = fullAmount.toString();
 
+    setFromToValueUpdated(true);
     setFromAndToTokenPairs({ ...fromAndToTokenValues, fromValue: amountInString, toValue: amountInString });
     validateAmounts(fullAmount);
   };
@@ -271,7 +273,8 @@ const useConverterHook = () => {
     error,
     walletBalance,
     updateWalletBalance,
-    resetFromAndToValues
+    resetFromAndToValues,
+    isFromToValueUpdated
   };
 };
 

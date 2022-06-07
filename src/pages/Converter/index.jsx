@@ -9,6 +9,7 @@ import styles from './styles';
 import useInjectableWalletHook from '../../libraries/useInjectableWalletHook';
 import SnetSnackbar from '../../components/snet-snackbar';
 import { useStyles } from '../Contact/styles';
+import { bigNumberToString } from '../../utils/bignumber';
 
 const GeneralLayout = lazy(() => import('../../layouts/GeneralLayout'));
 const WelcomeBox = lazy(() => import('./WelcomeBox'));
@@ -18,10 +19,10 @@ const ERC20TOADA = lazy(() => import('./ERC20TOADA'));
 const Converter = () => {
   const [error, setError] = useState({ showError: false, message: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const { tokenPairs } = useSelector((state) => state);
+  const { tokenPairs, wallet } = useSelector((state) => state);
   const classes = useStyles();
 
-  const { transferTokens } = useInjectableWalletHook([supportedCardanoWallets.NAMI]);
+  const { transferTokens } = useInjectableWalletHook([supportedCardanoWallets.NAMI], process.env.REACT_APP_CARDANO_NETWORK_ID);
 
   const { conversionDirection } = tokenPairs;
   const pendingTxn = useRef();
@@ -36,8 +37,9 @@ const Converter = () => {
       const assetName = conversionInfo.pair.from_token.symbol;
       const assetNameHex = Buffer.from(assetName).toString('hex');
       const assetPolicyId = conversionInfo.pair.from_token.token_address;
+      const depositAmount = bigNumberToString(amount);
 
-      await transferTokens(depositAddress, assetPolicyId, assetNameHex, amount);
+      await transferTokens(wallet.cardanoWalletSelected, depositAddress, assetPolicyId, assetNameHex, depositAmount);
       dispatch(setAdaConversionInfo(conversionInfo));
       dispatch(setConversionDirection(availableBlockchains.CARDANO));
       dispatch(setActiveStep(conversionSteps.CONVERT_TOKENS));

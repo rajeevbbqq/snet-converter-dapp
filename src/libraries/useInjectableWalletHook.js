@@ -82,12 +82,44 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     }
   };
 
+  const getNetworkId = async () => {
+    try {
+      const networkId = await injectedWallet.getNetworkId();
+      return networkId;
+    } catch (error) {
+      console.log('Error on getNetworkId: ', error);
+      throw error;
+    }
+  };
+
+  const connectWallet = async (walletName) => {
+    try {
+      const connectingWallet = toLower(walletName);
+
+      injectedWallet = await window.cardano[connectingWallet].enable();
+      const currentNetworkId = await getNetworkId();
+
+      if (Number(currentNetworkId) !== Number(expectedNetworkId)) {
+        throw new Error('Invalid network id selected');
+      }
+
+      return injectedWallet;
+    } catch (error) {
+      console.log('Error on connectWallet: ', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     detectCardanoInjectableWallets();
   }, []);
 
-  const getTokensAndBalance = async () => {
+  const getTokensAndBalance = async (walletIdentifier) => {
     try {
+      if (isNil(injectedWallet)) {
+        await connectWallet(walletIdentifier);
+      }
+
       const raw = await injectedWallet.getBalance();
       const value = Value.from_bytes(Buffer.from(raw, 'hex'));
       const assets = [];
@@ -120,7 +152,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
         }
       }
 
-      console.log('Assets: ', assets);
       return assets;
     } catch (error) {
       console.log('Error on getTokensAndBalance: ', JSON.stringify(error));
@@ -128,24 +159,65 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     }
   };
 
+  const getBalanceByPolicyScriptId = async (walletIdentifier, policyScriptId) => {
+    const balances = await getTokensAndBalance(walletIdentifier);
+    const balance = balances.find((balance) => balance.policy === policyScriptId);
+    return balance;
+  };
+
+  const getUsedAddresses = async () => {
+    try {
+      const raw = await injectedWallet.getUsedAddresses();
+      const usedAddresses = raw.map((address) => {
+        return Address.from_bytes(Buffer.from(address, 'hex')).to_bech32();
+      });
+
+      console.log('Used addresses: ', usedAddresses);
+    } catch (error) {
+      console.log('Error on getUsedAddresses: ', JSON.stringify(error));
+      throw error;
+    }
+  };
+
+  const getRewardAddresses = async () => {
+    try {
+      const raw = await injectedWallet.getRewardAddresses();
+      const rewardAddressess = raw.map((address) => {
+        return Address.from_bytes(Buffer.from(address, 'hex')).to_bech32();
+      });
+
+      console.log('rewardAddressess: ', rewardAddressess);
+    } catch (error) {
+      console.log('Error on getRewardAddresses: ', JSON.stringify(error));
+    }
+  };
+
+  const getUnusedAddresses = async () => {
+    try {
+      const raw = await injectedWallet.getUnusedAddresses();
+      const unusedAddressess = raw.map((address) => {
+        return Address.from_bytes(Buffer.from(address, 'hex')).to_bech32();
+      });
+
+      console.log('unusedAddressess: ', unusedAddressess);
+    } catch (error) {
+      console.log('Error on getUnusedAddresses: ', JSON.stringify(error));
+    }
+  };
+
   const getChangeAddress = async () => {
     try {
       const raw = await injectedWallet.getChangeAddress();
+
+      await getUsedAddresses();
+      await getRewardAddresses();
+      await getUnusedAddresses();
+
       const changeAddress = Address.from_bytes(Buffer.from(raw, 'hex')).to_bech32();
       console.log('Wallet address: ', changeAddress);
       return changeAddress;
     } catch (error) {
       console.log('Error on getChangeAddress: ', error);
-      throw error;
-    }
-  };
-
-  const getNetworkId = async () => {
-    try {
-      const networkId = await injectedWallet.getNetworkId();
-      return networkId;
-    } catch (error) {
-      console.log('Error on getNetworkId: ', error);
       throw error;
     }
   };
@@ -164,24 +236,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     );
 
     return txBuilder;
-  };
-
-  const connectWallet = async (walletName) => {
-    try {
-      const connectingWallet = toLower(walletName);
-
-      injectedWallet = await window.cardano[connectingWallet].enable();
-      const currentNetworkId = await getNetworkId();
-
-      if (currentNetworkId !== expectedNetworkId) {
-        throw new Error('Invalid network id selected');
-      }
-
-      return injectedWallet;
-    } catch (error) {
-      console.log('Error on connectWallet: ', error);
-      throw error;
-    }
   };
 
   const getUtxos = async () => {
@@ -203,8 +257,9 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     return txOutputs;
   };
 
-  const transferTokens = async (transferWalletAddress, assetPolicyIdHex, assetNameHex, assetQuantity) => {
+  const transferTokens = async (walletName, transferWalletAddress, assetPolicyIdHex, assetNameHex, assetQuantity) => {
     try {
+      await connectWallet(walletName);
       const txBuilder = await initTransactionBuilder();
       const changeAddress = await getChangeAddress();
       const shelleyOutputAddress = Address.from_bech32(transferWalletAddress);
@@ -268,7 +323,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     getTokensAndBalance,
     supportedWallets,
     transferTokens,
-    detectCardanoInjectableWallets
+    detectCardanoInjectableWallets,
+    getBalanceByPolicyScriptId
   };
 };
 

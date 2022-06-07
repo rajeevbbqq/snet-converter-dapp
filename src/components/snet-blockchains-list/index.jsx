@@ -1,3 +1,4 @@
+import { List, ListItem, Stack } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -9,7 +10,6 @@ import { useState } from 'react';
 import Button from '../snet-button';
 import style from './style';
 import WalletAddressInfo from './WalletAddressInfo';
-import WalletAddressInput from './WalletAddressInput';
 
 const BlockchainList = ({
   blockchain,
@@ -20,7 +20,7 @@ const BlockchainList = ({
   walletAddress,
   disconnectWallet,
   openWallet,
-  cardanoAddress
+  supportedWallets
 }) => {
   const [showInput, setShowInput] = useState(false);
 
@@ -36,7 +36,7 @@ const BlockchainList = ({
   };
 
   const isWalletAddressAvailable = () => {
-    return !isNil(walletAddress) && !showInput;
+    return !isNil(walletAddress);
   };
 
   const onCopyAddress = (address) => {
@@ -84,10 +84,7 @@ const BlockchainList = ({
               isWalletAvailable={isWalletAvailable}
             />
           ) : null}
-          {showInput ? (
-            <WalletAddressInput cardanoAddress={cardanoAddress} onSaveAddress={saveAddress} blockchain={blockchain} onCancel={showOrHideInput} />
-          ) : null}
-          {isNil(walletAddress) && !showInput ? (
+          {supportedWallets.length < 1 && isNil(walletAddress) ? (
             <Button
               onClick={() => {
                 if (!isWalletAvailable) {
@@ -102,6 +99,22 @@ const BlockchainList = ({
           ) : null}
         </Grid>
       </Grid>
+      {!isWalletAddressAvailable() ? (
+        <Box display="flex" alignItems="center" marginTop={4}>
+          {supportedWallets.map((wallet) => {
+            return (
+              <List key={wallet.identifier}>
+                <ListItem button onClick={() => openWallet(wallet)}>
+                  <Stack direction="column" alignItems="center" justifyContent="center">
+                    <img width="80px" alt={wallet.wallet} src={wallet.logo} />
+                    <ListItemText secondary={wallet.wallet} />
+                  </Stack>
+                </ListItem>
+              </List>
+            );
+          })}
+        </Box>
+      ) : null}
     </Box>
   );
 };
@@ -115,7 +128,11 @@ BlockchainList.propTypes = {
   onSaveAddress: propTypes.func,
   disconnectWallet: propTypes.func,
   openWallet: propTypes.func,
-  cardanoAddress: propTypes.string
+  supportedWallets: propTypes.array
+};
+
+BlockchainList.defaultProps = {
+  supportedWallets: []
 };
 
 export default BlockchainList;

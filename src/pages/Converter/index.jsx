@@ -15,10 +15,13 @@ const GeneralLayout = lazy(() => import('../../layouts/GeneralLayout'));
 const WelcomeBox = lazy(() => import('./WelcomeBox'));
 const ADATOERC20ETH = lazy(() => import('./ADATOERC20ETH'));
 const ERC20TOADA = lazy(() => import('./ERC20TOADA'));
+const SNETADAETHConversionInfo = lazy(() => import('../../components/snet-conversion-info'));
 
 const Converter = () => {
   const [error, setError] = useState({ showError: false, message: '' });
+  const [isPopupOpen, setPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversion, setConversion] = useState(null);
   const { tokenPairs, wallet } = useSelector((state) => state);
   const classes = useStyles();
 
@@ -33,6 +36,7 @@ const Converter = () => {
     try {
       setIsLoading(true);
       const { depositAddress, amount } = conversionInfo;
+      console.log('conversionInfo: ', conversionInfo);
 
       const assetName = conversionInfo.pair.from_token.symbol;
       const assetNameHex = Buffer.from(assetName).toString('hex');
@@ -41,8 +45,9 @@ const Converter = () => {
 
       await transferTokens(wallet.cardanoWalletSelected, depositAddress, assetPolicyId, assetNameHex, depositAmount);
       dispatch(setAdaConversionInfo(conversionInfo));
-      dispatch(setConversionDirection(availableBlockchains.CARDANO));
       dispatch(setActiveStep(conversionSteps.CONVERT_TOKENS));
+      setConversion(conversionInfo);
+      setPopup(true);
     } catch (error) {
       console.log('error', error);
       setError({ showError: true, message: error?.info || JSON.stringify(error) });
@@ -89,6 +94,7 @@ const Converter = () => {
             </Grid>
           </Grid>
         )}
+        {isPopupOpen && <SNETADAETHConversionInfo conversion={conversion} openPopup={isPopupOpen} />}
       </GeneralLayout>
     </>
   );

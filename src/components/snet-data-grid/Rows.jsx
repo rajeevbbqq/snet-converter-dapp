@@ -151,7 +151,7 @@ const Rows = ({
           {conversionDirection === conversionDirections.ADA_TO_ETH && status === conversionStatuses.USER_INITIATED ? (
             <SnetButton name="View" onClick={handleResume} variant="outlined" />
           ) : null}
-          {status === conversionStatuses.WAITING_FOR_CLAIM ? <SnetButton name="Continue" onClick={handleResume} variant="outlined" /> : null}
+          {status === conversionStatuses.WAITING_FOR_CLAIM ? <SnetButton name="Claim" onClick={handleResume} variant="outlined" /> : null}
           <CardActions disableSpacing>
             <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
               <ExpandMoreIcon />

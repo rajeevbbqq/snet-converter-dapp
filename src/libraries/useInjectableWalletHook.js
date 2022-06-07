@@ -173,6 +173,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       });
 
       console.log('Used addresses: ', usedAddresses);
+
+      return usedAddresses[0];
     } catch (error) {
       console.log('Error on getUsedAddresses: ', JSON.stringify(error));
       throw error;
@@ -324,7 +326,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     supportedWallets,
     transferTokens,
     detectCardanoInjectableWallets,
-    getBalanceByPolicyScriptId
+    getBalanceByPolicyScriptId,
+    getUsedAddresses
   };
 };
 

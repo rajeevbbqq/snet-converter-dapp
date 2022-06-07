@@ -124,6 +124,7 @@ const useConverterHook = () => {
     }
     const amountInString = fullAmount.toString();
 
+    setFromToValueUpdated(true);
     setFromAndToTokenPairs({ ...fromAndToTokenValues, fromValue: amountInString, toValue: amountInString });
     validateAmounts(fullAmount);
   };

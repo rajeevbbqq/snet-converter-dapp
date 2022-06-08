@@ -1,20 +1,21 @@
 import propTypes from 'prop-types';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { RefreshOutlined } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { isNil } from 'lodash';
 import { toLocalDateTime } from '../../utils/Date';
 import Columns from './Columns';
 import Rows from './Rows';
-import { setAdaConversionInfo, setConversionDirection, setActiveStep, setCurrentConversionStep } from '../../services/redux/slices/tokenPairs/tokenPairSlice';
 import { setFromAddress, setToAddress } from '../../services/redux/slices/wallet/walletSlice';
-import { availableBlockchains, conversionStatuses, conversionSteps, progress } from '../../utils/ConverterConstants';
-import paths from '../../router/paths';
+import { conversionStatuses, conversionSteps } from '../../utils/ConverterConstants';
+
 import { useStyles } from './styles';
 import SnetPagination from './Pagination';
+import SNETConversion from '../snet-conversion-info';
 
 const SnetDataGrid = ({
   paginationInfo,
@@ -32,8 +33,10 @@ const SnetDataGrid = ({
   setExpandedValue
 }) => {
   const classes = useStyles();
+
+  const [conversion, setConversion] = useState(null);
+
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleResume = (conversionInfo, conversionStatus) => {
     let activeStep;
@@ -55,15 +58,7 @@ const SnetDataGrid = ({
 
     dispatch(setFromAddress(wallet.from_address));
     dispatch(setToAddress(wallet.to_address));
-    dispatch(setAdaConversionInfo(conversionInfo));
-    dispatch(setConversionDirection(availableBlockchains.CARDANO));
-    dispatch(setActiveStep(activeStep));
-
-    for (let index = 0; index <= Number(activeStep); index++) {
-      dispatch(setCurrentConversionStep({ activeStep: index, progress: progress.COMPLETE }));
-    }
-
-    navigate(paths.Converter);
+    setConversion(conversionInfo);
   };
 
   return (
@@ -114,6 +109,7 @@ const SnetDataGrid = ({
         onItemSelect={onItemSelect}
         pageSizes={pageSizes}
       />
+      {!isNil(conversion) && <SNETConversion conversion={conversion} openPopup />}
     </div>
   );
 };

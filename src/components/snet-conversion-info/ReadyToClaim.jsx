@@ -13,11 +13,12 @@ import { setBlockchainStatus } from '../../services/redux/slices/blockchain/bloc
 import { blockchainStatusLabels } from '../../utils/ConverterConstants';
 import SnetLoader from '../snet-loader';
 
-const ReadyToClaim = ({ conversion }) => {
+const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
   const classes = useStyles();
   const [fees, setFees] = useState(0);
   const [claimAmount, setClaimAmount] = useState(0);
   const [token, setToken] = useState('');
+  const [conversionTitle, setConversionTitle] = useState('');
 
   const { fromAddress, toAddress } = useSelector((state) => state.wallet);
   const { blockchainStatus } = useSelector((state) => state.blockchains);
@@ -31,6 +32,9 @@ const ReadyToClaim = ({ conversion }) => {
     setClaimAmount(bigNumberToString(conversion.receivingAmount));
     setFees(bigNumberToString(conversion.conversionFees));
     setToken(conversion.pair.to_token.symbol);
+
+    const title = `${conversion.pair.from_token.symbol} [${conversion.pair.from_token.blockchain.name}] to ${conversion.pair.to_token.symbol} [${conversion.pair.to_token.blockchain.name}]`;
+    setConversionTitle(title);
   };
 
   useEffect(() => {
@@ -80,7 +84,7 @@ const ReadyToClaim = ({ conversion }) => {
   }
 
   return (
-    <SnetDialog isDialogOpen onDialogClose={() => {}} title="" showClosebutton>
+    <SnetDialog isDialogOpen={isReadyToClaim} onDialogClose={closePopup} title={conversionTitle} showClosebutton>
       <div className={classes.ethToAdaTransactionReceiptContainer}>
         <Box display="flex" alignItems="center" className={classes.progressSection}>
           <CheckCircleOutline />
@@ -117,7 +121,9 @@ const ReadyToClaim = ({ conversion }) => {
 };
 
 ReadyToClaim.propTypes = {
-  conversion: propTypes.object.isRequired
+  conversion: propTypes.object.isRequired,
+  isReadyToClaim: propTypes.bool.isRequired,
+  closePopup: propTypes.func.isRequired
 };
 
 export default ReadyToClaim;

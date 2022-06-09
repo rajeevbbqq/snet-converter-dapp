@@ -1,5 +1,5 @@
 import propTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, lazy } from 'react';
 import { useDispatch } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Backdrop from '@mui/material/Backdrop';
@@ -15,7 +15,8 @@ import { conversionStatuses, conversionSteps } from '../../utils/ConverterConsta
 
 import { useStyles } from './styles';
 import SnetPagination from './Pagination';
-import SNETConversion from '../snet-conversion-info';
+
+const SNETConversion = lazy(() => import('../snet-conversion-info'));
 
 const SnetDataGrid = ({
   paginationInfo,
@@ -35,8 +36,13 @@ const SnetDataGrid = ({
   const classes = useStyles();
 
   const [conversion, setConversion] = useState(null);
+  const [openConversionModal, setOpenConversionModal] = useState(false);
 
   const dispatch = useDispatch();
+
+  const toggleConversionModal = () => {
+    setOpenConversionModal(!openConversionModal);
+  };
 
   const handleResume = (conversionInfo, conversionStatus) => {
     let activeStep;
@@ -59,6 +65,7 @@ const SnetDataGrid = ({
     dispatch(setFromAddress(wallet.from_address));
     dispatch(setToAddress(wallet.to_address));
     setConversion(conversionInfo);
+    toggleConversionModal();
   };
 
   return (
@@ -109,7 +116,7 @@ const SnetDataGrid = ({
         onItemSelect={onItemSelect}
         pageSizes={pageSizes}
       />
-      {!isNil(conversion) && <SNETConversion conversion={conversion} openPopup />}
+      {!isNil(conversion) && <SNETConversion conversion={conversion} handleConversionModal={toggleConversionModal} openPopup={openConversionModal} />}
     </div>
   );
 };

@@ -72,7 +72,8 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
 
       dispatch(setBlockchainStatus(blockchainStatusLabels.ON_UPDATING_TXN_STATUS));
       await updateTransactionStatus(conversion.conversionId, txnHash);
-      dispatch(setBlockchainStatus(blockchainStatusLabels.RESET_CONVERSION_LABEL));
+      dispatch(setBlockchainStatus(null));
+      closePopup();
     } catch (error) {
       console.log('Error on onClaimTokens: ', error);
       throw error;
@@ -111,7 +112,7 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
             </Box>
           )}
           <Box className={classes.transactionReceiptActions}>
-            <SnetButton variant="text" onClick={() => {}} name="Claim tokens later" />
+            <SnetButton variant="text" onClick={closePopup} name="Claim tokens later" />
             <SnetButton onClick={onClaimTokens} name="Claim tokens" />
           </Box>
         </Box>

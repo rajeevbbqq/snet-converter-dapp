@@ -1,11 +1,33 @@
+import { useMemo } from 'react';
 import { Typography, Modal, Box, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import propTypes from 'prop-types';
 import SnetButton from '../../components/snet-button';
 import styles from './styles';
+import { txnOperations } from '../../utils/ConverterConstants';
 
-const ETHTOADAConversionPopup = ({ title, openPopup, handlePopupClose, openLink, blockConfiramtionsRequired, blockConfiramtionsReceived }) => {
+const ETHTOADAConversionPopup = ({
+  title,
+  openPopup,
+  handlePopupClose,
+  openLink,
+  blockConfiramtionsRequired,
+  blockConfiramtionsReceived,
+  transactionOperation
+}) => {
+  const opration = useMemo(() => {
+    let message = 'Awaiting Confimation';
+    if (transactionOperation === txnOperations.TOKEN_BURNT) {
+      message = 'Burning Tokens, Awaiting confirmation';
+    } else if (transactionOperation === txnOperations.TOKEN_MINTED) {
+      message = 'Mining Tokens, Awaiting confirmation';
+    } else if (transactionOperation === txnOperations.TOKEN_RECEIVED) {
+      message = 'Receiving Confirmation';
+    }
+
+    return message;
+  });
   return (
     <Modal open={openPopup} onClose={handlePopupClose} sx={styles.conersionModal}>
       <Box sx={styles.conersionBox}>
@@ -19,7 +41,7 @@ const ETHTOADAConversionPopup = ({ title, openPopup, handlePopupClose, openLink,
           <Box sx={styles.processingLoaderContainer}>
             <CircularProgress />
             <Typography>
-              Processing: Awaiting Confimation {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
+              Processing: {opration} {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
             </Typography>
           </Box>
           <Typography>
@@ -41,7 +63,8 @@ ETHTOADAConversionPopup.propTypes = {
   handlePopupClose: propTypes.func.isRequired,
   openLink: propTypes.func.isRequired,
   blockConfiramtionsRequired: propTypes.number.isRequired,
-  blockConfiramtionsReceived: propTypes.number.isRequired
+  blockConfiramtionsReceived: propTypes.number.isRequired,
+  transactionOperation: propTypes.string.isRequired
 };
 
 export default ETHTOADAConversionPopup;

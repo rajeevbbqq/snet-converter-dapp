@@ -54,7 +54,8 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
     updateWalletBalance,
     walletBalance,
     resetFromAndToValues,
-    conversionIsComplete
+    conversionIsComplete,
+    isFromToValueUpdated
   } = useConverterHook();
   const {
     mintERC20Tokens,
@@ -222,7 +223,7 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
               <ADATOETHButton conversionEnabled={!error.message.length && !isNil(fromAddress)} onClickConvert={getConversionIdForADATOETH} />
             ) : (
               <ETHTOADAButton
-                conversionEnabled={conversionEnabled && !error.error}
+                conversionEnabled={conversionEnabled && !error.error && isFromToValueUpdated}
                 authorizationRequired={authorizationRequired}
                 onClickConvert={onETHToADAConversion}
                 onClickAuthorize={onClickAuthorize}

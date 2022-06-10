@@ -37,13 +37,13 @@ const SnetDataGrid = ({
 
   const [conversion, setConversion] = useState(null);
   const [openConversionModal, setOpenConversionModal] = useState(false);
+  const [isReadyToClaim, setReadyToClaim] = useState(false);
 
   const dispatch = useDispatch();
 
   const toggleConversionModal = () => {
     setOpenConversionModal(!openConversionModal);
   };
-
   const handleResume = (conversionInfo, conversionStatus) => {
     let activeStep;
     switch (conversionStatus) {
@@ -65,6 +65,13 @@ const SnetDataGrid = ({
     dispatch(setFromAddress(wallet.from_address));
     dispatch(setToAddress(wallet.to_address));
     setConversion(conversionInfo);
+    setReadyToClaim(conversionStatus === conversionStatuses.WAITING_FOR_CLAIM);
+    toggleConversionModal();
+  };
+
+  const closeConfirmationPopup = () => {
+    refreshTxnHistory();
+    setConversion(null);
     toggleConversionModal();
   };
 
@@ -116,7 +123,15 @@ const SnetDataGrid = ({
         onItemSelect={onItemSelect}
         pageSizes={pageSizes}
       />
-      {!isNil(conversion) && <SNETConversion conversion={conversion} handleConversionModal={toggleConversionModal} openPopup={openConversionModal} />}
+      {!isNil(conversion) && (
+        <SNETConversion
+          conversion={conversion}
+          openPopup={openConversionModal}
+          handleConversionModal={closeConfirmationPopup}
+          openLink={closeConfirmationPopup}
+          readyToClaim={isReadyToClaim}
+        />
+      )}
     </div>
   );
 };

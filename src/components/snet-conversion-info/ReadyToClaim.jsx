@@ -28,7 +28,6 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
   const dispatch = useDispatch();
 
   const formatTransactionReciept = () => {
-    console.log('formatTransactionReciept', conversion);
     setClaimAmount(bigNumberToString(conversion.receivingAmount));
     setFees(bigNumberToString(conversion.conversionFees));
     setToken(conversion.pair.to_token.symbol);
@@ -72,11 +71,12 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
 
       dispatch(setBlockchainStatus(blockchainStatusLabels.ON_UPDATING_TXN_STATUS));
       await updateTransactionStatus(conversion.conversionId, txnHash);
-      dispatch(setBlockchainStatus(null));
-      closePopup();
     } catch (error) {
       console.log('Error on onClaimTokens: ', error);
       throw error;
+    } finally {
+      dispatch(setBlockchainStatus(null));
+      closePopup();
     }
   };
 

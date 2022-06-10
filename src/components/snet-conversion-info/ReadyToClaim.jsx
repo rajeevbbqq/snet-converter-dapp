@@ -71,11 +71,12 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
 
       dispatch(setBlockchainStatus(blockchainStatusLabels.ON_UPDATING_TXN_STATUS));
       await updateTransactionStatus(conversion.conversionId, txnHash);
-      dispatch(setBlockchainStatus(null));
-      closePopup();
     } catch (error) {
       console.log('Error on onClaimTokens: ', error);
       throw error;
+    } finally {
+      dispatch(setBlockchainStatus(null));
+      closePopup();
     }
   };
 

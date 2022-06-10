@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { getConversionStatus } from '../../utils/HttpRequests';
 import ConversionDetailsModal from '../../pages/Converter/ETHTOADAConversionPopup';
 import ReadyToClaim from './ReadyToClaim';
-import { txnOperations } from '../../utils/ConverterConstants';
+import { availableBlockchains, txnOperations } from '../../utils/ConverterConstants';
 
 const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink, readyToClaim }) => {
   const [conversionTitle, setConversionTitle] = useState('');
@@ -35,10 +35,9 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
 
       setOperation(transaction.transaction_operation);
       if (currentConfirmations >= totalBlockConfirmationsRequired) {
-        if (response.from_token.blockchain.name === 'Cardano' && transaction.transaction_operation === txnOperations.TOKEN_BURNT) {
+        const blockchainName = toUpper(response.from_token.blockchain.name);
+        if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_BURNT) {
           setIsReadyToClaim(true);
-        } else {
-          handleConversionModal();
         }
       }
       setConversionTitle(title);
@@ -59,16 +58,7 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
 
   useEffect(() => {
     if (openPopup && !isReadyToClaim) {
-      getConversionDetails();
-
-      const sixtySeconds = 60000;
-      const intervalId = setInterval(() => {
-        getConversionDetails();
-      }, sixtySeconds);
-
-      return () => {
-        clearInterval(intervalId);
-      };
+      startPollingConversionDetails();
     }
   }, []);
 

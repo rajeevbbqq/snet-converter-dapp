@@ -38,6 +38,8 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
         const blockchainName = toUpper(response.from_token.blockchain.name);
         if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_BURNT) {
           setIsReadyToClaim(true);
+        } else {
+          handleConversionModal();
         }
       }
       setConversionTitle(title);

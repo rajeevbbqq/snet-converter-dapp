@@ -7,7 +7,7 @@ import { getConversionStatus } from '../../utils/HttpRequests';
 import ConversionDetailsModal from '../../pages/Converter/ETHTOADAConversionPopup';
 import ReadyToClaim from './ReadyToClaim';
 
-const SNETConversion = ({ openPopup, conversion }) => {
+const SNETConversion = ({ openPopup, conversion, handleConversionModal }) => {
   const [conversionTitle, setConversionTitle] = useState('');
   const [blockConfirmationsRequired, setConfirmationsRequired] = useState(0);
   const [blockConfirmations, setConfirmations] = useState(0);
@@ -57,13 +57,18 @@ const SNETConversion = ({ openPopup, conversion }) => {
     }
   }, []);
 
+  const handlePopupModalClose = () => {
+    setIsReadyToClaim(false);
+    handleConversionModal();
+  };
+
   if (isReadyToClaim) {
-    return <ReadyToClaim conversion={conversion} />;
+    return <ReadyToClaim closePopup={handlePopupModalClose} isReadyToClaim={isReadyToClaim} conversion={conversion} />;
   }
 
   return (
     <ConversionDetailsModal
-      handlePopupClose={() => {}}
+      handlePopupClose={handleConversionModal}
       openPopup={openPopup}
       openLink={() => {}}
       title={conversionTitle}
@@ -75,7 +80,8 @@ const SNETConversion = ({ openPopup, conversion }) => {
 
 SNETConversion.propTypes = {
   openPopup: propTypes.bool,
-  conversion: propTypes.object
+  conversion: propTypes.object,
+  handleConversionModal: propTypes.func
 };
 
 export default SNETConversion;

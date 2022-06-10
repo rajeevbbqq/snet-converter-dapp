@@ -23,7 +23,7 @@ export const useStyles = makeStyles({
       color: '#000',
       fontSize: 14,
       letterSpacing: -0.01,
-      lineHeight: '18px'
+      lineHeight: '24px'
     },
     '& a': {
       paddingLeft: 5,

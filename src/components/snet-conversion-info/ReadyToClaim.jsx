@@ -1,8 +1,7 @@
 import propTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Typography } from '@mui/material';
-import { CheckCircleOutline } from '@mui/icons-material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import SnetButton from '../snet-button';
 import SnetDialog from '../snet-dialog';
 import { useStyles } from '../snet-conversion-status/styles';
@@ -12,6 +11,7 @@ import { conversionClaim, updateTransactionStatus } from '../../utils/HttpReques
 import { setBlockchainStatus } from '../../services/redux/slices/blockchain/blockchainSlice';
 import { blockchainStatusLabels } from '../../utils/ConverterConstants';
 import SnetLoader from '../snet-loader';
+import SnetAlert from '../snet-alert';
 
 const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
   const classes = useStyles();
@@ -88,9 +88,9 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
     <SnetDialog isDialogOpen={isReadyToClaim} onDialogClose={closePopup} title={conversionTitle} showClosebutton>
       <div className={classes.ethToAdaTransactionReceiptContainer}>
         <Box display="flex" alignItems="center" className={classes.progressSection}>
-          <CheckCircleOutline />
+          <CircularProgress />
           <Typography align="center" color="grey" variant="body2" marginLeft={2}>
-            Tokens conversion and claiming successfully completed.
+            Please claim the tokens to complete the conversion process.
           </Typography>
         </Box>
         <Box minWidth={540} className={classes.transactionReceiptContent}>
@@ -111,10 +111,20 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
               </Typography>
             </Box>
           )}
-          <Box className={classes.transactionReceiptActions}>
-            <SnetButton variant="text" onClick={closePopup} name="Claim tokens later" />
-            <SnetButton onClick={onClaimTokens} name="Claim tokens" />
-          </Box>
+        </Box>
+        <SnetAlert
+          iconPresence={false}
+          error={
+            <p>
+              Claiming the tokens can take upto few minutes depending on network traffic. Once initiated, claim progess can be checked from the transactions
+              history page.
+            </p>
+          }
+          type="info"
+        />
+        <Box className={classes.transactionReceiptActions}>
+          <SnetButton variant="text" onClick={closePopup} name="Claim tokens later" />
+          <SnetButton onClick={onClaimTokens} name="Claim tokens" />
         </Box>
       </div>
     </SnetDialog>

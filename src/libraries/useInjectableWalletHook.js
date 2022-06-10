@@ -48,29 +48,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     return HexToBuffer(value).toString('ascii');
   };
 
-  const experimentalSubscribeProvider = async (provider) => {
-    provider.on('accountChange', async (accounts) => {
-      console.log('accountChange', accounts);
-      // const [address] = accounts;
-      // setWalletAddress(address);
-    });
-    provider.on('networkChange', async (network) => {
-      // await detectNetwork();
-      console.log('networkChange', network);
-    });
-  };
-
-  const subscribeProvider = async () => {
-    console.log('subscribeProvider');
-    if (!isNil(window.cardano)) {
-      return;
-    }
-    console.log('accountChanged');
-
-    const accountChanged = await window.cardano.onAccountChange();
-    console.log('Account changed: ', accountChanged);
-  };
-
   const getSupportedWallets = (cardano) => {
     const wallets = [];
 
@@ -127,8 +104,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
         throw new Error('Invalid network id selected');
       }
 
-      experimentalSubscribeProvider(injectedWallet);
-
       return injectedWallet;
     } catch (error) {
       console.log('Error on connectWallet: ', error);
@@ -139,12 +114,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   useEffect(() => {
     detectCardanoInjectableWallets();
   }, []);
-
-  useEffect(() => {
-    if (injectedWallet) {
-      subscribeProvider();
-    }
-  }, [window.cardano]);
 
   const getTokensAndBalance = async (walletIdentifier) => {
     try {

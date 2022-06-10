@@ -28,7 +28,6 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
   const dispatch = useDispatch();
 
   const formatTransactionReciept = () => {
-    console.log('formatTransactionReciept', conversion);
     setClaimAmount(bigNumberToString(conversion.receivingAmount));
     setFees(bigNumberToString(conversion.conversionFees));
     setToken(conversion.pair.to_token.symbol);

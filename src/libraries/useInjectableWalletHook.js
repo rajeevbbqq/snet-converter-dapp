@@ -48,6 +48,29 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     return HexToBuffer(value).toString('ascii');
   };
 
+  const experimentalSubscribeProvider = async (provider) => {
+    provider.on('accountChange', async (accounts) => {
+      console.log('accountChange', accounts);
+      // const [address] = accounts;
+      // setWalletAddress(address);
+    });
+    provider.on('networkChange', async (network) => {
+      // await detectNetwork();
+      console.log('networkChange', network);
+    });
+  };
+
+  const subscribeProvider = async () => {
+    console.log('subscribeProvider');
+    if (!isNil(window.cardano)) {
+      return;
+    }
+    console.log('accountChanged');
+
+    const accountChanged = await window.cardano.onAccountChange();
+    console.log('Account changed: ', accountChanged);
+  };
+
   const getSupportedWallets = (cardano) => {
     const wallets = [];
 
@@ -85,6 +108,7 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   const getNetworkId = async () => {
     try {
       const networkId = await injectedWallet.getNetworkId();
+      console.log('Network ID: ', networkId);
       return networkId;
     } catch (error) {
       console.log('Error on getNetworkId: ', error);
@@ -103,6 +127,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
         throw new Error('Invalid network id selected');
       }
 
+      experimentalSubscribeProvider(injectedWallet);
+
       return injectedWallet;
     } catch (error) {
       console.log('Error on connectWallet: ', error);
@@ -113,6 +139,12 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   useEffect(() => {
     detectCardanoInjectableWallets();
   }, []);
+
+  useEffect(() => {
+    if (injectedWallet) {
+      subscribeProvider();
+    }
+  }, [window.cardano]);
 
   const getTokensAndBalance = async (walletIdentifier) => {
     try {
@@ -268,8 +300,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       const shelleyChangeAddress = Address.from_bech32(changeAddress);
 
       let txOutputBuilder = TransactionOutputBuilder.new();
-      txOutputBuilder = txOutputBuilder.with_address(shelleyOutputAddress);
-      txOutputBuilder = txOutputBuilder.next();
+      txOutputBuilder = await txOutputBuilder.with_address(shelleyOutputAddress);
+      txOutputBuilder = await txOutputBuilder.next();
 
       const multiAsset = MultiAsset.new();
       const assets = Assets.new();
@@ -285,7 +317,7 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       txOutputBuilder = txOutputBuilder.with_asset_and_min_required_coin(multiAsset, BigNum.from_str(protocolParams.coinsPerUtxoWord));
       const txOutput = txOutputBuilder.build();
 
-      txBuilder.add_output(txOutput);
+      await txBuilder.add_output(txOutput);
 
       // Find the available UTXOs in the wallet and
       // us them as Inputs
@@ -296,7 +328,7 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       txBuilder.add_change_if_needed(shelleyChangeAddress);
 
       // once the transaction is ready, we build it to get the tx body without witnesses
-      const txBody = txBuilder.build();
+      const txBody = await txBuilder.build();
 
       // Tx witness
       const transactionWitnessSet = TransactionWitnessSet.new();

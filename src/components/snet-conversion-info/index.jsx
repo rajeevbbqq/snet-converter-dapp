@@ -29,7 +29,7 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal }) => {
       const title = `${response.from_token.name} to ${response.to_token.name}`;
       const [confirmation] = response.transactions;
 
-      const currentConfirmations = confirmation.confirmation;
+      const currentConfirmations = confirmation.confirmation ?? 0;
       const totalBlockConfirmationsRequired = getTotalBlockConfirmations(response.from_token.blockchain.name);
 
       setIsReadyToClaim(currentConfirmations >= totalBlockConfirmationsRequired);
@@ -42,18 +42,16 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal }) => {
     }
   };
 
+  const startPollingConversionDetails = async () => {
+    await getConversionDetails();
+    const sixtySeconds = 60 * 1000;
+    const interval = setInterval(() => getConversionDetails(), sixtySeconds);
+    return () => clearInterval(interval);
+  };
+
   useEffect(() => {
     if (openPopup) {
-      getConversionDetails();
-
-      const sixtySeconds = 60000;
-      const intervalId = setInterval(() => {
-        getConversionDetails();
-      }, sixtySeconds);
-
-      return () => {
-        clearInterval(intervalId);
-      };
+      startPollingConversionDetails();
     }
   }, []);
 

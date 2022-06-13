@@ -20,9 +20,9 @@ const SnetConversionStatus = ({ link, isDialogOpen, onDialogClose, title, amount
     <SnetDialog isDialogOpen={isDialogOpen} onDialogClose={onDialogClose} title={title} showClosebutton>
       <div className={classes.ethToAdaTransactionReceiptContainer}>
         <Box display="flex" alignItems="center" className={classes.progressSection}>
-          <CheckCircleOutlineIcon />
+          <CheckCircleOutlineIcon className={classes.checkCircleIcon} />
           <Typography align="center" color="grey" variant="body2" marginLeft={2}>
-            Tokens conversion successfully initiated.
+            Tokens converted successfully.
           </Typography>
         </Box>
         <Box minWidth={540} className={classes.transactionReceiptContent}>

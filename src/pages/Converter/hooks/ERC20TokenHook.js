@@ -14,6 +14,7 @@ const useERC20TokenHook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConversionInProgress, setIsConversionInProgress] = useState({ status: false, blockConfiramtionsRequired: 0, blockConfiramtionsReceived: 0 });
   const [txnInfo, setTxnInfo] = useState({ txnLink: null, txnAmount: 0, tokenName: '', tokenSymbol: '' });
+  const [operation, setOperation] = useState('');
 
   const { tokens } = useSelector((state) => state.tokenPairs);
   const { entities } = useSelector((state) => state.blockchains);
@@ -36,14 +37,16 @@ const useERC20TokenHook = () => {
     const intervalId = setInterval(async () => {
       try {
         if (isBlockConfirmationPending) {
-          const { conversion, transactions } = await getConversionStatus(conversionId);
-          const { status } = conversion;
-          if (status === progress.PROCESSING) {
-            const [transaction] = transactions;
-            const { confirmation } = transaction;
-            isBlockConfirmationPending = Number(blockConfiramtionsRequired) > Number(confirmation);
-            setIsConversionInProgress({ status: isBlockConfirmationPending, blockConfiramtionsReceived: confirmation, blockConfiramtionsRequired });
+          const { transactions } = await getConversionStatus(conversionId);
+          const transaction = transactions.length ? transactions[transactions.length - 1] : transactions;
+          const { confirmation } = transaction;
+          if (transactions.length > 1 && Number(blockConfiramtionsRequired) <= Number(confirmation)) {
+            isBlockConfirmationPending = false;
+          } else {
+            isBlockConfirmationPending = true;
           }
+          setOperation(transaction.transaction_operation);
+          setIsConversionInProgress({ status: isBlockConfirmationPending, blockConfiramtionsReceived: confirmation, blockConfiramtionsRequired });
         }
       } catch (error) {
         console.log(error);
@@ -127,6 +130,7 @@ const useERC20TokenHook = () => {
       const amountInCogs = convertToCogs(amount, pair.from_token.allowed_decimal);
       const { conversionId, signature } = await getConversionId(pair.id, amountInCogs, fromAddress, toAddress);
       const txnLink = await convertEthToAda(contractAddress, amount, conversionId, signature, pair.from_token.allowed_decimal);
+      dispatch(setBlockchainStatus(null));
       getBlockConfirmationStatus(conversionId);
       setTxnInfo({ txnLink, txnAmount: amount, tokenName: pair.from_token.name, tokenSymbol: pair.from_token.symbol });
     } catch (error) {
@@ -201,7 +205,8 @@ const useERC20TokenHook = () => {
     txnInfo,
     resetTxnInfo,
     isConversionInProgress,
-    conversionIsComplete
+    conversionIsComplete,
+    operation
   };
 };
 

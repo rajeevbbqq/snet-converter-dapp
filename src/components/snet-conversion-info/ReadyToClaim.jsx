@@ -1,7 +1,8 @@
 import propTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import ProgressIcon from '@mui/icons-material/HourglassBottom';
 import SnetButton from '../snet-button';
 import SnetDialog from '../snet-dialog';
 import { useStyles } from '../snet-conversion-status/styles';
@@ -88,7 +89,7 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
     <SnetDialog isDialogOpen={isReadyToClaim} onDialogClose={closePopup} title={conversionTitle} showClosebutton>
       <div className={classes.ethToAdaTransactionReceiptContainer}>
         <Box display="flex" alignItems="center" className={classes.progressSection}>
-          <CircularProgress />
+          <ProgressIcon color="warning" />
           <Typography align="center" color="grey" variant="body2" marginLeft={2}>
             Please claim the tokens to complete the conversion process.
           </Typography>

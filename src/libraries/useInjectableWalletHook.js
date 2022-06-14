@@ -137,8 +137,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
 
   const listenEvents = () => {
     try {
-      console.log(window.cardano);
-
       emitter.on(window.cardano.onAccountChange, (event) => {
         connectWallet();
       });

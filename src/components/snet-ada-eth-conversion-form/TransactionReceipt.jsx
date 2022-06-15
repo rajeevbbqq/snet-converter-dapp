@@ -33,7 +33,7 @@ const TransactionReceipt = ({ receiptLines, txnHash }) => {
       <Box className={classes.successMsgIconContainer}>
         <ProgressIcon color="warning" fontSize="large" />
         <Typography variant="h3" color="grey">
-          Tokens conversion successfully initiated.
+          Tokens conversion successfully completed.
         </Typography>
       </Box>
       <Typography variant="h5" fontWeight="bold">

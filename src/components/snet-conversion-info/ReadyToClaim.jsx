@@ -14,7 +14,7 @@ import { blockchainStatusLabels } from '../../utils/ConverterConstants';
 import SnetLoader from '../snet-loader';
 import SnetAlert from '../snet-alert';
 
-const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
+const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup, onConversionComplete }) => {
   const classes = useStyles();
   const [fees, setFees] = useState(0);
   const [claimAmount, setClaimAmount] = useState(0);
@@ -72,12 +72,13 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
 
       dispatch(setBlockchainStatus(blockchainStatusLabels.ON_UPDATING_TXN_STATUS));
       await updateTransactionStatus(conversion.conversionId, txnHash);
+      onConversionComplete();
     } catch (error) {
       console.log('Error on onClaimTokens: ', error);
+      closePopup();
       throw error;
     } finally {
       dispatch(setBlockchainStatus(null));
-      closePopup();
     }
   };
 
@@ -135,7 +136,8 @@ const ReadyToClaim = ({ conversion, isReadyToClaim, closePopup }) => {
 ReadyToClaim.propTypes = {
   conversion: propTypes.object.isRequired,
   isReadyToClaim: propTypes.bool.isRequired,
-  closePopup: propTypes.func.isRequired
+  closePopup: propTypes.func.isRequired,
+  onConversionComplete: propTypes.func.isRequired
 };
 
 export default ReadyToClaim;

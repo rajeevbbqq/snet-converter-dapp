@@ -1,4 +1,4 @@
-import ProgressIcon from '@mui/icons-material/HourglassBottom';
+import Done from '@mui/icons-material/Done';
 import { Stack, Typography, Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ const TransactionReceipt = ({ receiptLines, txnHash }) => {
   return (
     <Box className={classes.adaEthTransactionReceipt}>
       <Box className={classes.successMsgIconContainer}>
-        <ProgressIcon color="warning" fontSize="large" />
+        <Done color="success" fontSize="large" />
         <Typography variant="h3" color="grey">
           Tokens conversion successfully completed.
         </Typography>

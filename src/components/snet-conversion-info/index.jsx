@@ -2,12 +2,14 @@ import { toUpper } from 'lodash';
 import propTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Box } from '@mui/material';
 
 import { getConversionStatus } from '../../utils/HttpRequests';
 import ConversionDetailsModal from '../../pages/Converter/ETHTOADAConversionPopup';
 import TransactionReceipt from '../snet-ada-eth-conversion-form/TransactionReceipt';
 import ReadyToClaim from './ReadyToClaim';
 import { availableBlockchains, txnOperations } from '../../utils/ConverterConstants';
+import SnetDialog from '../snet-dialog';
 
 const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink, readyToClaim }) => {
   const [conversionTitle, setConversionTitle] = useState('');
@@ -38,7 +40,6 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
     try {
       const { conversionId } = conversion;
       const response = await getConversionStatus(conversionId);
-      console.log(response);
 
       const title = `${response.from_token.name} to ${response.to_token.name}`;
       const transaction = response.transactions.length ? response.transactions[response.transactions.length - 1] : response.transactions;
@@ -93,7 +94,13 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
   };
 
   if (isConversionCompleted) {
-    return <TransactionReceipt receiptLines={txnReceipt} />;
+    return (
+      <SnetDialog showClosebutton={false} isDialogOpen onDialogClose={handlePopupModalClose}>
+        <Box padding={4}>
+          <TransactionReceipt onClose={handlePopupModalClose} receiptLines={txnReceipt} />
+        </Box>
+      </SnetDialog>
+    );
   }
 
   if (isReadyToClaim) {

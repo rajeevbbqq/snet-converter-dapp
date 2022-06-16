@@ -95,9 +95,9 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
 
   if (isConversionCompleted) {
     return (
-      <SnetDialog isDialogOpen onDialogClose={handlePopupModalClose}>
+      <SnetDialog showClosebutton={false} isDialogOpen onDialogClose={handlePopupModalClose}>
         <Box padding={4}>
-          <TransactionReceipt receiptLines={txnReceipt} />
+          <TransactionReceipt onClose={handlePopupModalClose} receiptLines={txnReceipt} />
         </Box>
       </SnetDialog>
     );

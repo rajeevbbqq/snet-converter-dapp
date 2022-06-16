@@ -16,7 +16,7 @@ const ETHTOADAConversionPopup = ({
   blockConfiramtionsReceived,
   transactionOperation
 }) => {
-  const opration = useMemo(() => {
+  const operation = useMemo(() => {
     let message = 'Awaiting Confimation';
     if (transactionOperation === txnOperations.TOKEN_BURNT) {
       message = 'Burning Tokens, Awaiting confirmation';
@@ -40,8 +40,10 @@ const ETHTOADAConversionPopup = ({
         <Box sx={styles.conversionModalBody}>
           <Box sx={styles.processingLoaderContainer}>
             <CircularProgress />
+            {transactionOperation === txnOperations.TOKEN_MINTED && <Typography>Processed: Burning Tokens</Typography>}
+            {transactionOperation === txnOperations.TOKEN_RECEIVED && <Typography>Processed: Minting Tokens</Typography>}
             <Typography>
-              Processing: {opration} {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
+              Processing: {operation} {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
             </Typography>
           </Box>
           <Typography>

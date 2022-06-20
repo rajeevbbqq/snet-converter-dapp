@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Typography, Modal, Box, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -16,6 +16,8 @@ const ETHTOADAConversionPopup = ({
   blockConfiramtionsReceived,
   transactionOperation
 }) => {
+  const [completedOperations, setCompletedOperations] = useState([]);
+
   const operation = useMemo(() => {
     let message = 'Awaiting Confimation';
     if (transactionOperation === txnOperations.TOKEN_BURNT) {
@@ -28,6 +30,17 @@ const ETHTOADAConversionPopup = ({
 
     return message;
   });
+
+  useEffect(() => {
+    if (transactionOperation === txnOperations.TOKEN_BURNT) {
+      setCompletedOperations([...completedOperations, 'Tokens Received']);
+    }
+
+    if (transactionOperation === txnOperations.TOKEN_MINTED) {
+      setCompletedOperations([...completedOperations, 'Tokens Burnt']);
+    }
+  }, [transactionOperation]);
+
   return (
     <Modal open={openPopup} onClose={handlePopupClose} sx={styles.conersionModal}>
       <Box sx={styles.conersionBox}>
@@ -40,8 +53,9 @@ const ETHTOADAConversionPopup = ({
         <Box sx={styles.conversionModalBody}>
           <Box sx={styles.processingLoaderContainer}>
             <CircularProgress />
-            {transactionOperation === txnOperations.TOKEN_MINTED && <Typography>Processed: Burning Tokens</Typography>}
-            {transactionOperation === txnOperations.TOKEN_RECEIVED && <Typography>Processed: Minting Tokens</Typography>}
+            {completedOperations.map((completedOperation) => {
+              return <Typography>Processed: {completedOperation}</Typography>;
+            })}
             <Typography>
               Processing: {operation} {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
             </Typography>

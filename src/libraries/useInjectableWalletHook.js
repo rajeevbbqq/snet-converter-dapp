@@ -117,6 +117,24 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     }
   };
 
+  const onCardanoAddressChange = (address) => address;
+  const onCardanoNetworkChange = (networkId) => networkId;
+
+  const listenEvents = (cardano) => {
+    console.log('Listen events');
+
+    window.cardano.onNetworkChange((networkId) => {
+      console.log('Network changed: ', networkId);
+      onCardanoNetworkChange(networkId);
+    });
+
+    window.cardano.onAccountChange((addresses) => {
+      const changeAddress = Address.from_bytes(Buffer.from(addresses[0], 'hex')).to_bech32();
+      console.log('Account changed: ', changeAddress);
+      onCardanoAddressChange(changeAddress);
+    });
+  };
+
   const connectWallet = async (walletName) => {
     try {
       const connectingWallet = toLower(walletName);
@@ -128,6 +146,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
         throw new Error('Invalid network id selected');
       }
 
+      listenEvents(injectedWallet);
+
       return injectedWallet;
     } catch (error) {
       console.log('Error on connectWallet: ', error);
@@ -135,23 +155,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     }
   };
 
-  const listenEvents = () => {
-    try {
-      emitter.on(window.cardano.onAccountChange, (event) => {
-        connectWallet();
-      });
-
-      emitter.on(window.cardano.onNetworkChange, (event) => {
-        connectWallet();
-      });
-    } catch (error) {
-      console.log('Error on listenEvents: ', error);
-    }
-  };
-
   useEffect(() => {
     detectCardanoInjectableWallets();
-    listenEvents();
   }, []);
 
   const getTokensAndBalance = async (walletIdentifier) => {
@@ -308,8 +313,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       const shelleyChangeAddress = Address.from_bech32(changeAddress);
 
       let txOutputBuilder = TransactionOutputBuilder.new();
-      txOutputBuilder = await txOutputBuilder.with_address(shelleyOutputAddress);
-      txOutputBuilder = await txOutputBuilder.next();
+      txOutputBuilder = txOutputBuilder.with_address(shelleyOutputAddress);
+      txOutputBuilder = txOutputBuilder.next();
 
       const multiAsset = MultiAsset.new();
       const assets = Assets.new();
@@ -325,7 +330,7 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       txOutputBuilder = txOutputBuilder.with_asset_and_min_required_coin(multiAsset, BigNum.from_str(protocolParams.coinsPerUtxoWord));
       const txOutput = txOutputBuilder.build();
 
-      await txBuilder.add_output(txOutput);
+      txBuilder.add_output(txOutput);
 
       // Find the available UTXOs in the wallet and
       // us them as Inputs
@@ -367,7 +372,9 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     transferTokens,
     detectCardanoInjectableWallets,
     getBalanceByPolicyScriptId,
-    getUsedAddresses
+    getUsedAddresses,
+    onCardanoAddressChange,
+    onCardanoNetworkChange
   };
 };
 

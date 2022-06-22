@@ -1,4 +1,4 @@
-import { List, ListItem, Stack } from '@mui/material';
+import { List, ListItem, Stack, Tooltip } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -51,25 +51,14 @@ const BlockchainList = ({
   };
 
   return (
-    <Box sx={style.box} divider id="snet-blockchains-list-box-1">
+    <Box divider id="snet-blockchains-list-box-1" sx={(style.box, blockchain === 'Ethereum' ? style.ethContainer : style.adaContainer)}>
       <Grid container sx={style.grid} minWidth="0">
         <Grid item sm={isWalletAddressAvailable() ? 6 : 4} sx={style.flex}>
           <Avatar alt={blockchain} src={blockchainLogo} />
           <ListItemText primary={blockchain} sx={style.blockchain} />
         </Grid>
-        {!isWalletAddressAvailable() ? (
-          <Grid item sm={4}>
-            <ListItemText
-              secondary={
-                <Typography sx={style.blockchainInfo} component="span" variant="body2" color="text.primary">
-                  {blockChainConnectInfo}
-                </Typography>
-              }
-            />
-          </Grid>
-        ) : null}
-        <Grid item sm={isWalletAddressAvailable() ? 6 : 4}>
-          {isWalletAddressAvailable() ? (
+        {isWalletAddressAvailable() ? (
+          <Grid item sm={isWalletAddressAvailable() ? 6 : 4} sx={style.walletAddInfo}>
             <WalletAddressInfo
               addEllipsisInBetweenString={addEllipsisInBetweenString}
               onCopyAddress={() => onCopyAddress(walletAddress)}
@@ -83,36 +72,35 @@ const BlockchainList = ({
               walletAddress={walletAddress}
               isWalletAvailable={isWalletAvailable}
             />
-          ) : null}
-          {supportedWallets.length < 1 && isNil(walletAddress) ? (
-            <Button
-              onClick={() => {
-                if (!isWalletAvailable) {
-                  showOrHideInput();
-                } else {
-                  openWallet();
-                }
-              }}
-              name={isWalletAvailable ? 'Connect' : 'Add'}
-              variant="outlined"
-            />
-          ) : null}
-        </Grid>
+          </Grid>
+        ) : null}
+        {/* {supportedWallets.length < 1 && isNil(walletAddress) ? (
+          <Button
+            onClick={() => {
+              if (!isWalletAvailable) {
+                showOrHideInput();
+              } else {
+                openWallet();
+              }
+            }}
+            name={isWalletAvailable ? 'Connect' : 'Add'}
+            variant="outlined"
+          />
+        ) : null} */}
       </Grid>
       {!isWalletAddressAvailable() ? (
         <Box display="flex" alignItems="center" marginTop={4}>
-          {supportedWallets.map((wallet) => {
-            return (
-              <List key={wallet.identifier}>
-                <ListItem button onClick={() => openWallet(wallet)}>
-                  <Stack direction="column" alignItems="center" justifyContent="center">
-                    <img width="80px" alt={wallet.wallet} src={wallet.logo} />
-                    <ListItemText secondary={wallet.wallet} />
-                  </Stack>
+          <List sx={style.cardanoWalletList}>
+            {supportedWallets.map((wallet) => {
+              return (
+                <ListItem key={wallet.identifier} onClick={() => openWallet(wallet)}>
+                  <Tooltip title={wallet.wallet}>
+                    <img alt={wallet.wallet} src={wallet.logo} />
+                  </Tooltip>
                 </ListItem>
-              </List>
-            );
-          })}
+              );
+            })}
+          </List>
         </Box>
       ) : null}
     </Box>

@@ -1,3 +1,10 @@
+import NamiWallet from '../assets/images/nami_logo.svg';
+import EternalWallet from '../assets/images/eternal_logo.svg';
+import GeroWallet from '../assets/images/gero_logo.svg';
+
+import WalletConnect from '../assets/images/walletconnect_logo.svg';
+import Metamask from '../assets/images/metamask_logo.svg';
+
 export const progress = {
   IDLE: 'IDLE',
   PROCESSING: 'PROCESSING',
@@ -11,8 +18,20 @@ export const supportedCardanoWallets = [
   {
     wallet: 'Nami',
     identifier: 'nami',
-    logo: 'https://uploads-ssl.webflow.com/60d83e3c6cf84748f7d0a62b/6167e043e809f9fcb32ae6c2_Nami%20Wallet.png',
+    logo: NamiWallet,
     site: 'https://namiwallet.io/'
+  },
+  {
+    wallet: 'Eternal',
+    identifier: 'eternal',
+    logo: EternalWallet,
+    site: 'https://eternl.io/'
+  },
+  {
+    wallet: 'Gero Wallet',
+    identifier: 'gerowallet',
+    logo: GeroWallet,
+    site: 'https://gerowallet.io/'
   },
   {
     wallet: 'Flint',
@@ -25,18 +44,21 @@ export const supportedCardanoWallets = [
     identifier: 'cardwallet',
     logo: 'https://uploads-ssl.webflow.com/60d83e3c6cf84748f7d0a62b/61281040b3b41b00da5259ec_Cardwallet.png',
     site: 'https://cwallet.finance'
+  }
+];
+
+export const supportedEtherumWallets = [
+  {
+    wallet: 'Wallet Connect',
+    identifier: 'walletconnect',
+    logo: WalletConnect,
+    site: 'https://walletconnect.com'
   },
   {
-    wallet: 'Gero Wallet',
-    identifier: 'gerowallet',
-    logo: 'https://uploads-ssl.webflow.com/60d83e3c6cf84748f7d0a62b/6117f6cf11c2b96621243241_GeroWallet.png',
-    site: 'https://gerowallet.io/'
-  },
-  {
-    wallet: 'Eternal',
-    identifier: 'eternl',
-    logo: 'https://uploads-ssl.webflow.com/60d83e3c6cf84748f7d0a62b/623d54126a85fa41bc71d574_Eternl.png',
-    site: 'https://eternl.io/'
+    wallet: 'Metamask',
+    identifier: 'metamask',
+    logo: Metamask,
+    site: 'https://metamask.io/'
   }
 ];
 
@@ -182,3 +204,4 @@ export const ContactSupportTypeOptions = [
 ];
 
 export const cardanoWalletConnected = 'cardanoWalletConnected';
+export const walletConnectionAgreed = 'walletConnectionAgreed';

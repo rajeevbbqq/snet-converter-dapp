@@ -12,7 +12,14 @@ import SnetBlockchainList from '../snet-blockchains-list';
 import { useWalletHook } from '../snet-wallet-connector/walletHook';
 import SnetButton from '../snet-button';
 import { setWallets, removeFromAndToAddress, setCardanoWalletSelected } from '../../services/redux/slices/wallet/walletSlice';
-import { availableBlockchains, cardanoSupportingWallets, cardanoWalletConnected, externalLinks, supportedCardanoWallets } from '../../utils/ConverterConstants';
+import {
+  availableBlockchains,
+  cardanoSupportingWallets,
+  cardanoWalletConnected,
+  externalLinks,
+  supportedCardanoNetworks,
+  supportedCardanoWallets
+} from '../../utils/ConverterConstants';
 import SnetSnackbar from '../snet-snackbar';
 import { useStyles } from './styles';
 
@@ -25,9 +32,12 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const [cardanoAddress, setCardanoAddress] = useState(null);
   const [isCardanoWalletExtensionAvailable, setIsCardanoWalletExtensionAvailable] = useState(true);
   const [error, setError] = useState({ showError: false, message: '' });
+  const [openModal, setOpenModal] = useState(false);
   const { address, disconnectEthereumWallet, connectEthereumWallet } = useWalletHook();
-  const { getUsedAddresses, connectWallet, getChangeAddress, detectCardanoInjectableWallets, onCardanoNetworkChange, onCardanoAddressChange } =
-    useInjectableWalletHook(cardanoSupportingWallets, cardanoNetworkId);
+  const { getUsedAddresses, connectWallet, getChangeAddress, detectCardanoInjectableWallets, selectedNetwork, selectedWallet } = useInjectableWalletHook(
+    cardanoSupportingWallets,
+    cardanoNetworkId
+  );
 
   const dispatch = useDispatch();
 
@@ -56,9 +66,11 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
     getCardanoAddress();
   }, []);
 
-  onCardanoAddressChange((cardanoAddress) => {
-    setCardanoAddress(cardanoAddress);
-  });
+  useEffect(() => {
+    if (!isNil(selectedWallet)) {
+      setCardanoAddress(selectedWallet);
+    }
+  }, [selectedWallet]);
 
   useEffect(() => {
     enableOrDisableAgreebutton();
@@ -142,7 +154,6 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
 
   const connectCardanoWallet = async (wallet) => {
     try {
-      console.log(wallet.identifier);
       await connectWallet(wallet.identifier);
 
       const cardanoWalletAddress = wallet.identifier === 'cardwallet' ? await getUsedAddresses() : await getChangeAddress();

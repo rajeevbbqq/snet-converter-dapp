@@ -1,20 +1,22 @@
 import propTypes from 'prop-types';
+import { useState, lazy } from 'react';
 import { useDispatch } from 'react-redux';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { RefreshOutlined } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { isNil } from 'lodash';
 import { toLocalDateTime } from '../../utils/Date';
 import Columns from './Columns';
 import Rows from './Rows';
-import { setAdaConversionInfo, setConversionDirection, setActiveStep, setCurrentConversionStep } from '../../services/redux/slices/tokenPairs/tokenPairSlice';
 import { setFromAddress, setToAddress } from '../../services/redux/slices/wallet/walletSlice';
-import { availableBlockchains, conversionStatuses, conversionSteps, progress } from '../../utils/ConverterConstants';
-import paths from '../../router/paths';
+import { conversionStatuses, conversionSteps } from '../../utils/ConverterConstants';
+
 import { useStyles } from './styles';
 import SnetPagination from './Pagination';
+
+const SNETConversion = lazy(() => import('../snet-conversion-info'));
 
 const SnetDataGrid = ({
   paginationInfo,
@@ -32,9 +34,16 @@ const SnetDataGrid = ({
   setExpandedValue
 }) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
+  const [conversion, setConversion] = useState(null);
+  const [openConversionModal, setOpenConversionModal] = useState(false);
+  const [isReadyToClaim, setReadyToClaim] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const toggleConversionModal = () => {
+    setOpenConversionModal(!openConversionModal);
+  };
   const handleResume = (conversionInfo, conversionStatus) => {
     let activeStep;
     switch (conversionStatus) {
@@ -55,15 +64,15 @@ const SnetDataGrid = ({
 
     dispatch(setFromAddress(wallet.from_address));
     dispatch(setToAddress(wallet.to_address));
-    dispatch(setAdaConversionInfo(conversionInfo));
-    dispatch(setConversionDirection(availableBlockchains.CARDANO));
-    dispatch(setActiveStep(activeStep));
+    setConversion(conversionInfo);
+    setReadyToClaim(conversionStatus === conversionStatuses.WAITING_FOR_CLAIM);
+    toggleConversionModal();
+  };
 
-    for (let index = 0; index <= Number(activeStep); index++) {
-      dispatch(setCurrentConversionStep({ activeStep: index, progress: progress.COMPLETE }));
-    }
-
-    navigate(paths.Converter);
+  const closeConfirmationPopup = () => {
+    refreshTxnHistory();
+    setConversion(null);
+    toggleConversionModal();
   };
 
   return (
@@ -114,6 +123,15 @@ const SnetDataGrid = ({
         onItemSelect={onItemSelect}
         pageSizes={pageSizes}
       />
+      {!isNil(conversion) && (
+        <SNETConversion
+          conversion={conversion}
+          openPopup={openConversionModal}
+          handleConversionModal={closeConfirmationPopup}
+          openLink={closeConfirmationPopup}
+          readyToClaim={isReadyToClaim}
+        />
+      )}
     </div>
   );
 };

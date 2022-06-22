@@ -148,10 +148,10 @@ const Rows = ({
           </div>
         </Grid>
         <Grid item xs={12} md={12} lg={2} className={classes.expandArrowContainer} justifyContent="flex-end">
-          {conversionDirection === conversionDirections.ADA_TO_ETH && status === conversionStatuses.USER_INITIATED ? (
+          {status === conversionStatuses.USER_INITIATED || status === conversionStatuses.PROCESSING ? (
             <SnetButton name="View" onClick={handleResume} variant="outlined" />
           ) : null}
-          {status === conversionStatuses.WAITING_FOR_CLAIM ? <SnetButton name="Continue" onClick={handleResume} variant="outlined" /> : null}
+          {status === conversionStatuses.WAITING_FOR_CLAIM ? <SnetButton name="Claim" onClick={handleResume} variant="outlined" /> : null}
           <CardActions disableSpacing>
             <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
               <ExpandMoreIcon />

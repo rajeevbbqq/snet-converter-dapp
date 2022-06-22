@@ -19,8 +19,32 @@ import {
   Value
 } from '@emurgo/cardano-serialization-lib-asmjs';
 import AssetFingerprint from '@emurgo/cip14-js';
+import EventEmitter from 'eventemitter2';
 
 let injectedWallet;
+
+const emitter = new EventEmitter({
+  // set this to `true` to use wildcards
+  wildcard: false,
+
+  // the delimiter used to segment namespaces
+  delimiter: '.',
+
+  // set this to `true` if you want to emit the newListener event
+  newListener: false,
+
+  // set this to `true` if you want to emit the removeListener event
+  removeListener: false,
+
+  // the maximum amount of listeners that can be assigned to an event
+  maxListeners: 10,
+
+  // show event name in memory leak message when more than maximum amount of listeners is assigned
+  verboseMemoryLeak: false,
+
+  // disable throwing uncaughtException if an error event is emitted and it has no listeners
+  ignoreErrors: false
+});
 
 const protocolParams = {
   linearFee: {
@@ -85,11 +109,30 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   const getNetworkId = async () => {
     try {
       const networkId = await injectedWallet.getNetworkId();
+      console.log('Network ID: ', networkId);
       return networkId;
     } catch (error) {
       console.log('Error on getNetworkId: ', error);
       throw error;
     }
+  };
+
+  const onCardanoAddressChange = (address) => address;
+  const onCardanoNetworkChange = (networkId) => networkId;
+
+  const listenEvents = (cardano) => {
+    console.log('Listen events');
+
+    window.cardano.onNetworkChange((networkId) => {
+      console.log('Network changed: ', networkId);
+      onCardanoNetworkChange(networkId);
+    });
+
+    window.cardano.onAccountChange((addresses) => {
+      const changeAddress = Address.from_bytes(Buffer.from(addresses[0], 'hex')).to_bech32();
+      console.log('Account changed: ', changeAddress);
+      onCardanoAddressChange(changeAddress);
+    });
   };
 
   const connectWallet = async (walletName) => {
@@ -102,6 +145,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       if (Number(currentNetworkId) !== Number(expectedNetworkId)) {
         throw new Error('Invalid network id selected');
       }
+
+      listenEvents(injectedWallet);
 
       return injectedWallet;
     } catch (error) {
@@ -173,6 +218,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       });
 
       console.log('Used addresses: ', usedAddresses);
+
+      return usedAddresses[0];
     } catch (error) {
       console.log('Error on getUsedAddresses: ', JSON.stringify(error));
       throw error;
@@ -294,7 +341,7 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
       txBuilder.add_change_if_needed(shelleyChangeAddress);
 
       // once the transaction is ready, we build it to get the tx body without witnesses
-      const txBody = txBuilder.build();
+      const txBody = await txBuilder.build();
 
       // Tx witness
       const transactionWitnessSet = TransactionWitnessSet.new();
@@ -324,7 +371,10 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
     supportedWallets,
     transferTokens,
     detectCardanoInjectableWallets,
-    getBalanceByPolicyScriptId
+    getBalanceByPolicyScriptId,
+    getUsedAddresses,
+    onCardanoAddressChange,
+    onCardanoNetworkChange
   };
 };
 

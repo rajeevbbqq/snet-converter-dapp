@@ -68,7 +68,8 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
     isLoading,
     burnERC20Tokens,
     txnInfo,
-    isConversionInProgress
+    isConversionInProgress,
+    operation
   } = useERC20TokenHook();
   const { toAddress, fromAddress, wallets } = wallet;
   const { getBalanceByPolicyScriptId } = useInjectableWalletHook(cardanoSupportingWallets, process.env.REACT_APP_CARDANO_NETWORK_ID);
@@ -238,6 +239,7 @@ const ERC20TOADA = ({ onADATOETHConversion, callPendingTxnAlert }) => {
               openPopup={showConfirmationBlockPopup}
               handlePopupClose={handlePopupClose}
               openLink={openLink}
+              transactionOperation={operation}
             />
           ) : null}
         </Box>

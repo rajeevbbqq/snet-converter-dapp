@@ -12,7 +12,6 @@ export const useStyles = makeStyles({
     flexDirection: 'column',
     '& svg': {
       marginBottom: 5,
-      color: '#00C48C',
       fontSize: 48
     },
     '& p': {
@@ -22,6 +21,9 @@ export const useStyles = makeStyles({
       lineHeight: '28px',
       textAlign: 'center'
     }
+  },
+  checkCircleIcon: {
+    color: '#00C48C'
   },
   transactionReceiptContent: {
     '& p': {

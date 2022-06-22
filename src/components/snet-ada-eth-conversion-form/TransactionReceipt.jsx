@@ -1,4 +1,4 @@
-import ProgressIcon from '@mui/icons-material/HourglassBottom';
+import Done from '@mui/icons-material/HourglassBottom';
 import { Stack, Typography, Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { resetConversionStepsForAdaToEth, setActiveStep, setConversionDirection 
 import { availableBlockchains, conversionSteps } from '../../utils/ConverterConstants';
 import { useStyles } from './styles';
 
-const TransactionReceipt = ({ receiptLines, txnHash }) => {
+const TransactionReceipt = ({ receiptLines, txnHash, onClose }) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -21,6 +21,7 @@ const TransactionReceipt = ({ receiptLines, txnHash }) => {
     dispatch(setConversionDirection(availableBlockchains.ETHEREUM));
     dispatch(resetConversionStepsForAdaToEth());
     dispatch(setActiveStep(conversionSteps.DEPOSIT_TOKENS));
+    onClose();
   };
 
   const openLink = () => {
@@ -31,7 +32,7 @@ const TransactionReceipt = ({ receiptLines, txnHash }) => {
   return (
     <Box className={classes.adaEthTransactionReceipt}>
       <Box className={classes.successMsgIconContainer}>
-        <ProgressIcon color="warning" fontSize="large" />
+        <Done color="warning" fontSize="large" />
         <Typography variant="h3" color="grey">
           Tokens conversion successfully initiated.
         </Typography>
@@ -59,7 +60,8 @@ const TransactionReceipt = ({ receiptLines, txnHash }) => {
 
 TransactionReceipt.propTypes = {
   receiptLines: propTypes.arrayOf(propTypes.object),
-  txnHash: propTypes.string
+  txnHash: propTypes.string,
+  onClose: propTypes.func
 };
 
 TransactionReceipt.defaultProps = {

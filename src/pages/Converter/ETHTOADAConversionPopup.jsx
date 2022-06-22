@@ -1,11 +1,46 @@
+import { useMemo, useState, useEffect } from 'react';
 import { Typography, Modal, Box, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import propTypes from 'prop-types';
 import SnetButton from '../../components/snet-button';
 import styles from './styles';
+import { txnOperations } from '../../utils/ConverterConstants';
 
-const ETHTOADAConversionPopup = ({ title, openPopup, handlePopupClose, openLink, blockConfiramtionsRequired, blockConfiramtionsReceived }) => {
+const ETHTOADAConversionPopup = ({
+  title,
+  openPopup,
+  handlePopupClose,
+  openLink,
+  blockConfiramtionsRequired,
+  blockConfiramtionsReceived,
+  transactionOperation
+}) => {
+  const [completedOperations, setCompletedOperations] = useState([]);
+
+  const operation = useMemo(() => {
+    let message = 'Awaiting Confimation';
+    if (transactionOperation === txnOperations.TOKEN_BURNT) {
+      message = 'Burning Tokens, Awaiting confirmation';
+    } else if (transactionOperation === txnOperations.TOKEN_MINTED) {
+      message = 'Mining Tokens, Awaiting confirmation';
+    } else if (transactionOperation === txnOperations.TOKEN_RECEIVED) {
+      message = 'Receiving Confirmation';
+    }
+
+    return message;
+  });
+
+  useEffect(() => {
+    if (transactionOperation === txnOperations.TOKEN_BURNT) {
+      setCompletedOperations([...completedOperations, 'Tokens Received']);
+    }
+
+    if (transactionOperation === txnOperations.TOKEN_MINTED) {
+      setCompletedOperations([...completedOperations, 'Tokens Burnt']);
+    }
+  }, [transactionOperation]);
+
   return (
     <Modal open={openPopup} onClose={handlePopupClose} sx={styles.conersionModal}>
       <Box sx={styles.conersionBox}>
@@ -18,8 +53,11 @@ const ETHTOADAConversionPopup = ({ title, openPopup, handlePopupClose, openLink,
         <Box sx={styles.conversionModalBody}>
           <Box sx={styles.processingLoaderContainer}>
             <CircularProgress />
+            {completedOperations.map((completedOperation) => {
+              return <Typography>Processed: {completedOperation}</Typography>;
+            })}
             <Typography>
-              Processing: Awaiting Confimation {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
+              Processing: {operation} {blockConfiramtionsReceived}/{blockConfiramtionsRequired}
             </Typography>
           </Box>
           <Typography>
@@ -41,7 +79,8 @@ ETHTOADAConversionPopup.propTypes = {
   handlePopupClose: propTypes.func.isRequired,
   openLink: propTypes.func.isRequired,
   blockConfiramtionsRequired: propTypes.number.isRequired,
-  blockConfiramtionsReceived: propTypes.number.isRequired
+  blockConfiramtionsReceived: propTypes.number.isRequired,
+  transactionOperation: propTypes.string.isRequired
 };
 
 export default ETHTOADAConversionPopup;

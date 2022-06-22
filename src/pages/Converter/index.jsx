@@ -1,6 +1,7 @@
 import { lazy, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
 import { Backdrop, CircularProgress, Grid } from '@mui/material';
 import { availableBlockchains, conversionSteps, supportedCardanoWallets } from '../../utils/ConverterConstants';
 import { setAdaConversionInfo, setConversionDirection, setActiveStep } from '../../services/redux/slices/tokenPairs/tokenPairSlice';
@@ -10,15 +11,21 @@ import useInjectableWalletHook from '../../libraries/useInjectableWalletHook';
 import SnetSnackbar from '../../components/snet-snackbar';
 import { useStyles } from '../Contact/styles';
 import { bigNumberToString } from '../../utils/bignumber';
+import Paths from '../../router/paths';
+import { setBlockchainStatus } from '../../services/redux/slices/blockchain/blockchainSlice';
 
 const GeneralLayout = lazy(() => import('../../layouts/GeneralLayout'));
 const WelcomeBox = lazy(() => import('./WelcomeBox'));
 const ADATOERC20ETH = lazy(() => import('./ADATOERC20ETH'));
 const ERC20TOADA = lazy(() => import('./ERC20TOADA'));
+const SNETADAETHConversionInfo = lazy(() => import('../../components/snet-conversion-info'));
 
 const Converter = () => {
+  const navigate = useNavigate();
   const [error, setError] = useState({ showError: false, message: '' });
+  const [isPopupOpen, setPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversion, setConversion] = useState(null);
   const { tokenPairs, wallet } = useSelector((state) => state);
   const classes = useStyles();
 
@@ -33,6 +40,7 @@ const Converter = () => {
     try {
       setIsLoading(true);
       const { depositAddress, amount } = conversionInfo;
+      console.log('conversionInfo: ', conversionInfo);
 
       const assetName = conversionInfo.pair.from_token.symbol;
       const assetNameHex = Buffer.from(assetName).toString('hex');
@@ -41,8 +49,10 @@ const Converter = () => {
 
       await transferTokens(wallet.cardanoWalletSelected, depositAddress, assetPolicyId, assetNameHex, depositAmount);
       dispatch(setAdaConversionInfo(conversionInfo));
-      dispatch(setConversionDirection(availableBlockchains.CARDANO));
       dispatch(setActiveStep(conversionSteps.CONVERT_TOKENS));
+      dispatch(setBlockchainStatus(null));
+      setConversion(conversionInfo);
+      setPopup(true);
     } catch (error) {
       console.log('error', error);
       setError({ showError: true, message: error?.info || JSON.stringify(error) });
@@ -59,6 +69,13 @@ const Converter = () => {
   const callPendingTxnAlert = () => {
     pendingTxn.current.fetchPendingTransactionCounts();
   };
+
+  const closeConfirmationPopup = () => {
+    setConversion(null);
+    setPopup(false);
+  };
+
+  const openLink = () => navigate(Paths.Transactions);
 
   return (
     <>
@@ -88,6 +105,9 @@ const Converter = () => {
               <ERC20TOADA callPendingTxnAlert={callPendingTxnAlert} onADATOETHConversion={onADATOETHConversion} />
             </Grid>
           </Grid>
+        )}
+        {isPopupOpen && (
+          <SNETADAETHConversionInfo conversion={conversion} openPopup={isPopupOpen} handleConversionModal={closeConfirmationPopup} openLink={openLink} />
         )}
       </GeneralLayout>
     </>

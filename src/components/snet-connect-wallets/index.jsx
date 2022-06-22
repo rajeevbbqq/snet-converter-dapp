@@ -19,7 +19,6 @@ import {
   cardanoWalletConnected,
   externalLinks,
   supportedCardanoWallets,
-  supportedCardanoWallets,
   supportedEtherumWallets,
   walletConnectionAgreed
 } from '../../utils/ConverterConstants';

@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 export const useStyles = makeStyles({
   connectWalletContent: {
     width: 800,
-    padding: '32px 16px',
+    padding: '16px 24px',
     '& > div': {
       paddingBottom: 23,
       borderBottom: '1px solid #D6D6D6',
@@ -14,6 +14,7 @@ export const useStyles = makeStyles({
         marginBottom: 0
       },
       '& > div': {
+        flexDirection: 'column',
         alignItems: 'flex-start',
         '& > div': {
           '&:first-of-type': {
@@ -29,30 +30,40 @@ export const useStyles = makeStyles({
     '@media(max-width: 800px)': { width: '100%' }
   },
   connectWalletActions: {
-    padding: '18px 32px',
+    padding: '0 24px',
+    marginBottom: 32,
     display: 'flex',
-    justifyContent: 'space-between',
-    backgroundColor: '#eee',
-    '& div': {
-      display: 'flex',
-      alignItems: 'center',
-      '& p': {
-        color: '#9e9e9e',
-        fontSize: 13,
-        fontWeight: 600,
-        letterSpacing: -0.14,
-        lineHeight: '16px'
-      },
-      '& span': {
-        paddingLeft: 5,
-        color: '#4086ff',
-        fontSize: 13,
-        fontWeight: 600,
-        letterSpacing: -0.14,
-        lineHeight: '16px'
+    flexDirection: 'column',
+    alignItems: 'center',
+    '& ul': {
+      width: '100%',
+      padding: '16px',
+      border: '1.5px solid #4086FF',
+      borderRadius: 4,
+      margin: '0 0 32px',
+      backgroundColor: '#DEEAFF',
+      '& li': {
+        listStyle: 'none',
+        '& p': {
+          fontSize: 14,
+          fontWeight: 'bold',
+          letterSpacing: -0.01,
+          lineHeight: '28px',
+          '&:last-of-type': { display: 'inline-block' }
+        },
+        '& span': {
+          paddingLeft: 5,
+          color: '#4086ff',
+          cursor: 'pointer',
+          fontSize: 13,
+          fontWeight: 600,
+          letterSpacing: -0.14,
+          lineHeight: '16px'
+        }
       }
     },
     '& button': {
+      fontSize: '14px',
       '@media(max-width: 600px)': { marginTop: 15 }
     },
     '@media(max-width: 600px)': { flexDirection: 'column' }

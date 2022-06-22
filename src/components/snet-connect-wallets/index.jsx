@@ -8,11 +8,20 @@ import { isNil } from 'lodash';
 import store from 'store';
 import useInjectableWalletHook from '../../libraries/useInjectableWalletHook';
 import SnetDialog from '../snet-dialog';
+// eslint-disable-next-line import/no-named-as-default
 import SnetBlockchainList from '../snet-blockchains-list';
 import { useWalletHook } from '../snet-wallet-connector/walletHook';
 import SnetButton from '../snet-button';
 import { setWallets, removeFromAndToAddress, setCardanoWalletSelected } from '../../services/redux/slices/wallet/walletSlice';
-import { availableBlockchains, cardanoSupportingWallets, cardanoWalletConnected, externalLinks, supportedCardanoWallets } from '../../utils/ConverterConstants';
+import {
+  availableBlockchains,
+  cardanoSupportingWallets,
+  cardanoWalletConnected,
+  externalLinks,
+  supportedCardanoWallets,
+  supportedEtherumWallets,
+  walletConnectionAgreed
+} from '../../utils/ConverterConstants';
 import SnetSnackbar from '../snet-snackbar';
 import { useStyles } from './styles';
 
@@ -21,6 +30,7 @@ const cardanoNetworkId = Number(process.env.REACT_APP_CARDANO_NETWORK_ID);
 const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const classes = useStyles();
   const [isAgreed, setIsAgreed] = useState(false);
+  const [isTermsAgreed, setIsTermsAgreed] = useState(false);
   const [enableAgreeButton, setEnableAgreeButton] = useState(false);
   const [cardanoAddress, setCardanoAddress] = useState(null);
   const [isCardanoWalletExtensionAvailable, setIsCardanoWalletExtensionAvailable] = useState(true);
@@ -52,8 +62,19 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
     }
   };
 
+  const getAgreedStatus = () => {
+    try {
+      const isTermsAgreedOrNot = store.get(walletConnectionAgreed, false);
+      setIsTermsAgreed(isTermsAgreedOrNot);
+    } catch (error) {
+      console.log('Error on getAgreedStatus', error);
+      throw new Error(error);
+    }
+  };
+
   useEffect(() => {
     getCardanoAddress();
+    getAgreedStatus();
   }, []);
 
   onCardanoAddressChange((cardanoAddress) => {
@@ -127,6 +148,7 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
 
   const getSignatureFromWallet = async () => {
     try {
+      await store.set(walletConnectionAgreed, true);
       setIsAgreed(true);
       setWalletAddresses();
       onDialogClose();
@@ -189,13 +211,16 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
     if (blockchainName === availableBlockchains.CARDANO) {
       return supportedCardanoWallets;
     }
+    if (blockchainName === availableBlockchains.ETHEREUM) {
+      return supportedEtherumWallets;
+    }
     return [];
   };
 
   return (
     <>
       <SnetSnackbar open={error.showError} message={error.message} onClose={closeError} />
-      <SnetDialog title="Connect Wallets" onDialogClose={onDialogClose} isDialogOpen={isDialogOpen}>
+      <SnetDialog title="Connect Your Wallets" onDialogClose={onDialogClose} isDialogOpen={isDialogOpen}>
         <Box className={classes.connectWalletContent}>
           {blockchains.map((blockchain) => {
             return (
@@ -216,13 +241,24 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
           })}
         </Box>
         <Box className={classes.connectWalletActions}>
-          <Box>
-            <Typography>By connecting to the wallets, you agree to our</Typography>
-            <Typography onClick={openTermsAndConditions} variant="caption">
-              Terms & Conditions
-            </Typography>
-          </Box>
-          <SnetButton onClick={getSignatureFromWallet} disabled={!enableAgreeButton} name="Agree" />
+          {!isTermsAgreed ? (
+            <>
+              <ul>
+                <li>
+                  <Typography>1. You have to connect both Cardano & Ethereum wallets to proceed with the conversion.</Typography>
+                </li>
+                <li>
+                  <Typography>2. By connecting to the wallets, you agree to our</Typography>
+                  <Typography onClick={openTermsAndConditions} variant="caption">
+                    Terms & Conditions
+                  </Typography>
+                </li>
+              </ul>
+              <SnetButton onClick={getSignatureFromWallet} disabled={!enableAgreeButton} name="Agree & connect" />
+            </>
+          ) : (
+            <SnetButton onClick={onDialogClose} variant="outlined" name="Close" />
+          )}
         </Box>
       </SnetDialog>
     </>

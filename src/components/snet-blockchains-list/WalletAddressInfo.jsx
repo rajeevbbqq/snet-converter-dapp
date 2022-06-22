@@ -23,7 +23,7 @@ const WalletAddressInfo = ({ addEllipsisInBetweenString, onCopyAddress, walletAd
     <>
       <Stack direction="row" alignItems="center">
         <WalletIcon sx={style.icon} color="grey" />
-        <Typography variant="caption" color="text.primary" textOverflow="ellipsis" overflow="hidden">
+        <Typography variant="caption" color="text.primary" fontSize="16px">
           {addEllipsisInBetweenString(walletAddress)}
         </Typography>
       </Stack>

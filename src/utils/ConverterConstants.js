@@ -67,6 +67,11 @@ export const supportedEthereumNetworks = {
   3: 'Ropsten'
 };
 
+export const supportedCardanoNetworks = {
+  1: 'Mainnet',
+  0: 'Testnet'
+};
+
 export const conversionDirections = {
   ETH_TO_ADA: 'ETH_TO_ADA',
   ADA_TO_ETH: 'ADA_TO_ETH'

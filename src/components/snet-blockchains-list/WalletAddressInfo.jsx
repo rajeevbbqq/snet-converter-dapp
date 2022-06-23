@@ -10,7 +10,6 @@ import style from './style';
 
 const WalletAddressInfo = ({ addEllipsisInBetweenString, onCopyAddress, walletAddress, isWalletAvailable, onEdit, onDisconnect }) => {
   const [copyBtn, setCopyBtn] = useState('Copy');
-  const disconnectBtnColor = '#000';
 
   const onClickCopy = () => {
     onCopyAddress(walletAddress);

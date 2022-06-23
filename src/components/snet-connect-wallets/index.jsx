@@ -261,7 +261,7 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
               <SnetButton onClick={getSignatureFromWallet} disabled={!enableAgreeButton} name="Agree & connect" />
             </>
           ) : (
-            <SnetButton onClick={onDialogClose} variant="outlined" name="Close" />
+            <SnetButton className={classes.closeBtn} onClick={onDialogClose} variant="outlined" name="Close" />
           )}
         </Box>
       </SnetDialog>

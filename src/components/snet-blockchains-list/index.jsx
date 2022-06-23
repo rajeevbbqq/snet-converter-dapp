@@ -74,19 +74,6 @@ const BlockchainList = ({
             />
           </Grid>
         ) : null}
-        {/* {supportedWallets.length < 1 && isNil(walletAddress) ? (
-          <Button
-            onClick={() => {
-              if (!isWalletAvailable) {
-                showOrHideInput();
-              } else {
-                openWallet();
-              }
-            }}
-            name={isWalletAvailable ? 'Connect' : 'Add'}
-            variant="outlined"
-          />
-        ) : null} */}
       </Grid>
       {!isWalletAddressAvailable() ? (
         <Box display="flex" alignItems="center" marginTop={4}>

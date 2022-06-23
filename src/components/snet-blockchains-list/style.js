@@ -79,7 +79,8 @@ const style = {
       }
     }
   },
-  walletAddInfo: { marginTop: '23px' }
+  walletAddInfo: { marginTop: '23px' },
+  disconnectBtn: { color: '#D0021B' }
 };
 
 export default style;

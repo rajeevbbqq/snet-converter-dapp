@@ -12,7 +12,7 @@ export const progress = {
   ERROR: 'ERROR'
 };
 
-export const cardanoSupportingWallets = ['nami', 'flint', 'cardwallet', 'gerowallet', 'eternl'];
+export const cardanoSupportingWallets = ['nami', 'gerowallet', 'flint', 'cardwallet'];
 
 export const supportedCardanoWallets = [
   {
@@ -21,12 +21,12 @@ export const supportedCardanoWallets = [
     logo: NamiWallet,
     site: 'https://namiwallet.io/'
   },
-  {
-    wallet: 'Eternal',
-    identifier: 'eternal',
-    logo: EternalWallet,
-    site: 'https://eternl.io/'
-  },
+  // {
+  //   wallet: 'Eternal',
+  //   identifier: 'eternal',
+  //   logo: EternalWallet,
+  //   site: 'https://eternl.io/'
+  // },
   {
     wallet: 'Gero Wallet',
     identifier: 'gerowallet',

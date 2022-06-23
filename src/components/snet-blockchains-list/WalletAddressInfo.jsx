@@ -10,6 +10,7 @@ import style from './style';
 
 const WalletAddressInfo = ({ addEllipsisInBetweenString, onCopyAddress, walletAddress, isWalletAvailable, onEdit, onDisconnect }) => {
   const [copyBtn, setCopyBtn] = useState('Copy');
+  const disconnectBtnColor = '#000';
 
   const onClickCopy = () => {
     onCopyAddress(walletAddress);
@@ -36,7 +37,7 @@ const WalletAddressInfo = ({ addEllipsisInBetweenString, onCopyAddress, walletAd
             Edit
           </Button>
         ) : null}
-        <Button onClick={onDisconnect} variant="text" color="error" startIcon={<LogoutIcon />}>
+        <Button onClick={onDisconnect} variant="text" sx={style.disconnectBtn} startIcon={<LogoutIcon />}>
           Disconnect
         </Button>
       </Stack>

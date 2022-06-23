@@ -64,6 +64,7 @@ export const useStyles = makeStyles({
     },
     '& button': {
       fontSize: '14px',
+      padding: '5px 76px !important',
       '@media(max-width: 600px)': { marginTop: 15 }
     },
     '@media(max-width: 600px)': { flexDirection: 'column' }

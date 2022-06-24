@@ -6,6 +6,7 @@ const walletSlice = createSlice({
   initialState: {
     cardanoWalletSelected: null,
     isWalletInitializing: true,
+    isReadyToClaim: false,
     wallets: [],
     signature: '',
     fromAddress: null,
@@ -13,6 +14,9 @@ const walletSlice = createSlice({
     conversionDirection: conversionDirections.ETH_TO_ADA
   },
   reducers: {
+    setReadyToClaim: (state, action) => {
+      state.isReadyToClaim = action.payload;
+    },
     setCardanoWalletSelected: (state, action) => {
       state.cardanoWalletSelected = action.payload;
     },
@@ -38,7 +42,15 @@ const walletSlice = createSlice({
   }
 });
 
-export const { setCardanoWalletSelected, setWallets, setSignature, setFromAddress, setToAddress, removeFromAndToAddress, setConversionDirection } =
-  walletSlice.actions;
+export const {
+  setCardanoWalletSelected,
+  setWallets,
+  setSignature,
+  setFromAddress,
+  setToAddress,
+  removeFromAndToAddress,
+  setConversionDirection,
+  setReadyToClaim
+} = walletSlice.actions;
 
 export default walletSlice;

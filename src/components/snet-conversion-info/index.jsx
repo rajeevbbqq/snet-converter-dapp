@@ -49,7 +49,7 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
       setOperation(transaction.transaction_operation);
       if (currentConfirmations >= totalBlockConfirmationsRequired) {
         const blockchainName = toUpper(response.from_token.blockchain.name);
-        if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_BURNT) {
+        if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_MINTED) {
           setIsReadyToClaim(true);
         }
       }

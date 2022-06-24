@@ -1,12 +1,13 @@
 import { toUpper } from 'lodash';
 import propTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Box } from '@mui/material';
 
 import { getConversionStatus } from '../../utils/HttpRequests';
 import ConversionDetailsModal from '../../pages/Converter/ETHTOADAConversionPopup';
 import TransactionReceipt from '../snet-ada-eth-conversion-form/TransactionReceipt';
+import { setReadyToClaim } from '../../services/redux/slices/wallet/walletSlice';
 import ReadyToClaim from './ReadyToClaim';
 import { availableBlockchains, txnOperations } from '../../utils/ConverterConstants';
 import SnetDialog from '../snet-dialog';
@@ -15,17 +16,19 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
   const [conversionTitle, setConversionTitle] = useState('');
   const [blockConfirmationsRequired, setConfirmationsRequired] = useState(0);
   const [blockConfirmations, setConfirmations] = useState(0);
-  const [isReadyToClaim, setIsReadyToClaim] = useState(readyToClaim);
   const [isConversionCompleted, setIsConversionCompleted] = useState(false);
   const [txnReceipt, setTxnReceipt] = useState([]);
   const [operation, setOperation] = useState('');
 
   const { entities } = useSelector((state) => state.blockchains);
+  const { isReadyToClaim } = useSelector((state) => state.wallet);
 
   const getTotalBlockConfirmations = (blockchainName) => {
     const [blockchain] = entities.filter((entity) => toUpper(entity.name) === toUpper(blockchainName));
     return blockchain.block_confirmation;
   };
+
+  const dispatch = useDispatch();
 
   const generateReceipt = (depositAmount, claimAmount, txnFee, fromTokenSymbol, toTokenSymbol) => {
     return [
@@ -49,8 +52,9 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
       setOperation(transaction.transaction_operation);
       if (currentConfirmations >= totalBlockConfirmationsRequired) {
         const blockchainName = toUpper(response.from_token.blockchain.name);
-        if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_MINTED) {
-          setIsReadyToClaim(true);
+        if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_BURNT) {
+          console.log(`${blockchainName} block confirmations completed`);
+          dispatch(setReadyToClaim(true));
         }
       }
       setConversionTitle(title);
@@ -89,7 +93,7 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
   }, []);
 
   const handlePopupModalClose = () => {
-    setIsReadyToClaim(false);
+    dispatch(setReadyToClaim(false));
     handleConversionModal();
   };
 

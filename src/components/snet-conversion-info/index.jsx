@@ -39,6 +39,19 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
     ];
   };
 
+  const handleConversionComplete = () => {
+    const receipt = generateReceipt(
+      conversion.depositAmount,
+      conversion.receivingAmount,
+      conversion.conversionFees,
+      conversion.pair.from_token.symbol,
+      conversion.pair.to_token.symbol
+    );
+
+    setTxnReceipt(receipt);
+    setIsConversionCompleted(true);
+  };
+
   const getConversionDetails = async () => {
     try {
       const { conversionId } = conversion;
@@ -56,6 +69,10 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
           console.log(`${blockchainName} block confirmations completed`);
           dispatch(setReadyToClaim(true));
         }
+
+        if (blockchainName === availableBlockchains.CARDANO && transaction.transaction_operation === txnOperations.TOKEN_MINTED) {
+          handleConversionComplete();
+        }
       }
       setConversionTitle(title);
       setConfirmations(currentConfirmations);
@@ -64,19 +81,6 @@ const SNETConversion = ({ openPopup, conversion, handleConversionModal, openLink
       console.log('Error on getConversionDetails: ', error);
       throw error;
     }
-  };
-
-  const handleConversionComplete = () => {
-    const receipt = generateReceipt(
-      conversion.depositAmount,
-      conversion.receivingAmount,
-      conversion.conversionFees,
-      conversion.pair.from_token.symbol,
-      conversion.pair.to_token.symbol
-    );
-
-    setTxnReceipt(receipt);
-    setIsConversionCompleted(true);
   };
 
   const startPollingConversionDetails = async () => {

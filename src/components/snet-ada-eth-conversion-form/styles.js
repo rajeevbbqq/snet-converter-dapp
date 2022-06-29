@@ -125,7 +125,7 @@ export const useStyles = makeStyles({
     }
   },
   successMsgIconContainer: {
-    margin: '32px 0',
+    margin: '0 0 32px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -134,11 +134,12 @@ export const useStyles = makeStyles({
       fontSize: 16,
       fontWeight: 600,
       lineHeight: '28px'
-    }
+    },
+    '& svg': { color: '#00C48C' }
   },
   receiptList: {
     borderBottom: '1px solid #ebebeb',
-    padding: '10px 0',
+    padding: '10px 22px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',

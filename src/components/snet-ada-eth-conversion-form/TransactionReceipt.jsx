@@ -1,4 +1,4 @@
-import Done from '@mui/icons-material/HourglassBottom';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { Stack, Typography, Box } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -32,9 +32,9 @@ const TransactionReceipt = ({ receiptLines, txnHash, onClose }) => {
   return (
     <Box className={classes.adaEthTransactionReceipt}>
       <Box className={classes.successMsgIconContainer}>
-        <Done color="warning" fontSize="large" />
+        <CheckCircleOutlineIcon fontSize="large" />
         <Typography variant="h3" color="grey">
-          Tokens conversion successfully initiated.
+          Tokens conversion and claiming successfully completed.
         </Typography>
       </Box>
       <Typography variant="h5" fontWeight="bold">

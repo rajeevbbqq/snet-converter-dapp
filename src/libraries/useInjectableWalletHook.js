@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toLower from 'lodash/toLower';
 import isNil from 'lodash/isNil';
+
 import {
   Address,
   AssetName,
@@ -12,6 +13,8 @@ import {
   Transaction,
   TransactionBuilder,
   TransactionBuilderConfigBuilder,
+  TransactionHash,
+  TransactionInput,
   TransactionOutputBuilder,
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
@@ -20,6 +23,8 @@ import {
 } from '@emurgo/cardano-serialization-lib-asmjs';
 import AssetFingerprint from '@emurgo/cip14-js';
 import EventEmitter from 'eventemitter2';
+
+import { Lucid, Blockfrost } from 'lucid-cardano';
 
 let injectedWallet;
 
@@ -118,8 +123,6 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   };
 
   const listenEvents = (cardano) => {
-    console.log('Listen events');
-
     window.cardano.onNetworkChange((networkId) => {
       console.log('Network changed: ', networkId);
       setSelectedNetwork(networkId);
@@ -285,7 +288,8 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   const getUtxos = async () => {
     try {
       const utxosRaw = await injectedWallet.getUtxos();
-      return utxosRaw.map((utxo) => TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex')));
+      return utxosRaw;
+      // return utxosRaw.map((utxo) => TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex')));
     } catch (error) {
       console.log('Error on getUtxos: ', error);
       throw error;
@@ -304,57 +308,103 @@ const useInjectableWalletHook = (supportingWallets, expectedNetworkId) => {
   const transferTokens = async (walletName, transferWalletAddress, assetPolicyIdHex, assetNameHex, assetQuantity) => {
     try {
       await connectWallet(walletName);
-      const txBuilder = await initTransactionBuilder();
-      const changeAddress = await getChangeAddress();
-      const shelleyOutputAddress = Address.from_bech32(transferWalletAddress);
-      const shelleyChangeAddress = Address.from_bech32(changeAddress);
 
-      let txOutputBuilder = TransactionOutputBuilder.new();
-      txOutputBuilder = txOutputBuilder.with_address(shelleyOutputAddress);
-      txOutputBuilder = txOutputBuilder.next();
+      const api = await window.cardano.nami.enable();
+      // const bfAPI = new Blockfrost('https://cardano-testnet.blockfrost.io/api/v0', 'testnet-key');
+      // const lucidClient = await Lucid.new(bfAPI, 'Testnet');
+      // await lucidClient.selectWallet(api);
 
-      const multiAsset = MultiAsset.new();
-      const assets = Assets.new();
-      assets.insert(
-        AssetName.new(Buffer.from(assetNameHex, 'hex')), // Asset Name
-        BigNum.from_str(assetQuantity) // How much to send
-      );
-      multiAsset.insert(
-        ScriptHash.from_bytes(Buffer.from(assetPolicyIdHex, 'hex')), // PolicyID
-        assets
-      );
+      // const tx = await lucidClient
+      //   .newTx()
+      //   .attachMintingPolicy({
+      //     type: 'Native',
+      //     script: Buffer.from(policy.script.to_bytes()).toString('hex')
+      //   })
+      //   .mintAssets(mintAssets)
+      //   .complete();
 
-      txOutputBuilder = txOutputBuilder.with_asset_and_min_required_coin(multiAsset, BigNum.from_str(protocolParams.coinsPerUtxoWord));
-      const txOutput = txOutputBuilder.build();
+      // const tx = await lucid
+      //   .newTx()
+      //   .payToAddress(transferWalletAddress, {
+      //     lovelace: 5000000n
+      //     // assets: {
+      //     //   [assetPolicyIdHex]: {
+      //     //     [assetNameHex]: assetQuantity
+      //     //   }
+      //     // }
+      //   })
+      //   .complete();
+      // const signedTx = await tx.sign().complete();
+      // const txHash = await signedTx.submit();
+      // console.log(txHash);
 
-      txBuilder.add_output(txOutput);
+      // Using serialization library
 
-      // Find the available UTXOs in the wallet and
-      // us them as Inputs
-      const txUnspentOutputs = await getTxUnspentOutputs();
-      txBuilder.add_inputs_from(txUnspentOutputs, 3);
+      // const txBuilder = await initTransactionBuilder();
+      // const changeAddress = await getChangeAddress();
+      // const shelleyOutputAddress = Address.from_bech32(transferWalletAddress);
+      // const shelleyChangeAddress = Address.from_bech32(changeAddress);
 
-      // calculate the min fee required and send any change to an address
-      txBuilder.add_change_if_needed(shelleyChangeAddress);
+      // let txOutputBuilder = TransactionOutputBuilder.new();
+      // txOutputBuilder = txOutputBuilder.with_address(shelleyOutputAddress);
+      // txOutputBuilder = txOutputBuilder.next();
 
-      // once the transaction is ready, we build it to get the tx body without witnesses
-      const txBody = await txBuilder.build();
+      // const multiAsset = MultiAsset.new();
+      // const assets = Assets.new();
+      // assets.insert(
+      //   AssetName.new(Buffer.from(assetNameHex, 'hex')), // Asset Name
+      //   BigNum.from_str(assetQuantity) // How much to send
+      // );
+      // multiAsset.insert(
+      //   ScriptHash.from_bytes(Buffer.from(assetPolicyIdHex, 'hex')), // PolicyID
+      //   assets
+      // );
 
-      // Tx witness
-      const transactionWitnessSet = TransactionWitnessSet.new();
+      // txOutputBuilder = txOutputBuilder.with_asset_and_min_required_coin(multiAsset, BigNum.from_str(protocolParams.coinsPerUtxoWord));
+      // const txOutput = txOutputBuilder.build();
 
-      const tx = Transaction.new(txBody, TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()));
+      // txBuilder.add_output(txOutput);
 
-      let txVkeyWitnesses = await injectedWallet.signTx(Buffer.from(tx.to_bytes(), 'utf8').toString('hex'), true);
-      txVkeyWitnesses = TransactionWitnessSet.from_bytes(Buffer.from(txVkeyWitnesses, 'hex'));
+      // // Find the available UTXOs in the wallet and
+      // // us them as Inputs
+      // // const txUnspentOutputs = await getTxUnspentOutputs();
 
-      transactionWitnessSet.set_vkeys(txVkeyWitnesses.vkeys());
+      // const rawUtxos = await getUtxos();
 
-      const signedTx = Transaction.new(tx.body(), transactionWitnessSet);
+      // for (const utxo of rawUtxos) {
+      //   const txnInput = TransactionInput.new(TransactionHash.from_bytes(utxo), 0);
 
-      const submittedTxHash = await injectedWallet.submitTx(Buffer.from(signedTx.to_bytes(), 'utf8').toString('hex'));
+      //   txBuilder.add_input(shelleyChangeAddress, txnInput, 1);
+      // }
+      // // console.log('rawUtxos: ', rawUtxos);
 
-      return submittedTxHash;
+      // // txBuilder.add_inputs_from(txUnspentOutputs, 3);
+
+      // // for (let index = 0; index < 10; index++) {
+      // //   txInput.push(TransactionInput.new());
+      // // }
+
+      // // calculate the min fee required and send any change to an address
+      // txBuilder.add_change_if_needed(shelleyChangeAddress);
+
+      // // once the transaction is ready, we build it to get the tx body without witnesses
+      // const txBody = await txBuilder.build();
+
+      // // Tx witness
+      // const transactionWitnessSet = TransactionWitnessSet.new();
+
+      // const tx = Transaction.new(txBody, TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()));
+
+      // let txVkeyWitnesses = await injectedWallet.signTx(Buffer.from(tx.to_bytes(), 'utf8').toString('hex'), true);
+      // txVkeyWitnesses = TransactionWitnessSet.from_bytes(Buffer.from(txVkeyWitnesses, 'hex'));
+
+      // transactionWitnessSet.set_vkeys(txVkeyWitnesses.vkeys());
+
+      // const signedTx = Transaction.new(tx.body(), transactionWitnessSet);
+
+      // const submittedTxHash = await injectedWallet.submitTx(Buffer.from(signedTx.to_bytes(), 'utf8').toString('hex'));
+
+      // return submittedTxHash;
     } catch (error) {
       console.log('Error on transferToken: ', error);
       throw error;

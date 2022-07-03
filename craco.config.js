@@ -46,6 +46,7 @@ module.exports = {
         });
       });
 
+      // Adjust the config for the wasm loader
       const wasmLoader = {
         loader: require.resolve('wasm-loader'),
         options: {

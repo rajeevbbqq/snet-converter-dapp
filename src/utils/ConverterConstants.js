@@ -12,7 +12,7 @@ export const progress = {
   ERROR: 'ERROR'
 };
 
-export const cardanoSupportingWallets = ['nami', 'gerowallet', 'flint', 'cardwallet'];
+export const cardanoSupportingWallets = ['nami', 'gero', 'flint', 'cardwallet'];
 
 export const supportedCardanoWallets = [
   {

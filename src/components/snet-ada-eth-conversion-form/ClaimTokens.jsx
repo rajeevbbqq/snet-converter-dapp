@@ -12,7 +12,7 @@ const ClaimTokens = ({ onClickClaim, onClickContinueLater }) => {
   return (
     <>
       <Typography variant="h6" marginY={4}>
-        Tokens Conversion process is successfully competed. Now user can interact with Metamask and claim the amount.
+        Tokens Conversion process is successfully completed. Now user can interact with Metamask and claim the amount.
       </Typography>
       <AdaToEthTokenAndValue
         fromTokenAmount={conversion.depositAmount}

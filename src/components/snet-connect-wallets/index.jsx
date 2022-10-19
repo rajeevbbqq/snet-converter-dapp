@@ -4,7 +4,7 @@ import upperCase from 'lodash/upperCase';
 import { isValidShelleyAddress } from 'cardano-crypto.js';
 import propTypes from 'prop-types';
 import { Box, Typography } from '@mui/material';
-import { isNil } from 'lodash';
+import { isNil, isEmpty } from 'lodash';
 import store from 'store';
 import useInjectableWalletHook from '../../libraries/useInjectableWalletHook';
 import SnetDialog from '../snet-dialog';
@@ -29,13 +29,14 @@ const cardanoNetworkId = Number(process.env.REACT_APP_CARDANO_NETWORK_ID);
 
 const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const classes = useStyles();
+  const { wallet } = useSelector((state) => state);
   const [isAgreed, setIsAgreed] = useState(false);
   const [isTermsAgreed, setIsTermsAgreed] = useState(false);
   const [enableAgreeButton, setEnableAgreeButton] = useState(false);
   const [cardanoAddress, setCardanoAddress] = useState(null);
   const [isCardanoWalletExtensionAvailable, setIsCardanoWalletExtensionAvailable] = useState(true);
   const [error, setError] = useState({ showError: false, message: '' });
-  const [openModal, setOpenModal] = useState(false);
+  // const [openModal, setOpenModal] = useState(false);
   const { address, disconnectEthereumWallet, connectEthereumWallet } = useWalletHook();
   const { getUsedAddresses, connectWallet, getChangeAddress, detectCardanoInjectableWallets, selectedNetwork, selectedWallet } = useInjectableWalletHook(
     cardanoSupportingWallets,
@@ -154,6 +155,7 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
   const getSignatureFromWallet = async () => {
     try {
       await store.set(walletConnectionAgreed, true);
+      setIsTermsAgreed(true);
       setIsAgreed(true);
       setWalletAddresses();
       onDialogClose();
@@ -260,9 +262,17 @@ const SnetConnectWallet = ({ isDialogOpen, onDialogClose, blockchains }) => {
               </ul>
               <SnetButton onClick={getSignatureFromWallet} disabled={!enableAgreeButton} name="Agree & connect" />
             </>
-          ) : (
-            <SnetButton className={classes.closeBtn} onClick={onDialogClose} variant="outlined" name="Close" />
-          )}
+          ) : null}
+          {isTermsAgreed && isEmpty(wallet.wallets) ? (
+            <>
+              <ul>
+                <li>
+                  <Typography>1. You have to connect both Cardano & Ethereum wallets to proceed with the conversion.</Typography>
+                </li>
+              </ul>
+              <SnetButton onClick={getSignatureFromWallet} disabled={!enableAgreeButton} name="Connect" />
+            </>
+          ) : null}
         </Box>
       </SnetDialog>
     </>
